@@ -1,4 +1,0 @@
----
-title: Methods
-output-file: index
----
