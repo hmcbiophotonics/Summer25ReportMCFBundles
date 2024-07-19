@@ -1,0 +1,25 @@
+project:
+  type: book
+
+book:
+  title: "Quarto-Report-OpenIVIS"
+  author: "Ruby Peterman and Hailey Knolton"
+  date: "7/19/2024"
+  chapters:
+    - index.qmd
+    - Sections/Introduction/introduction.qmd
+    - Sections/Methods/methods.qmd
+    - Sections/Results/results.qmd
+    - Sections/Conclusion/conclusion.qmd
+    - Sections/Acknowledgements/acknowledgements.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+
