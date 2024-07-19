@@ -5,6 +5,8 @@ book:
   author:
     - name: Hailey Knolton
       email: hknolton@g.hmc.edu
+    - name: Ruby Peterman
+      email: rpeterman@g.hmc.edu
 
   date: 2024-07-11
   chapters:

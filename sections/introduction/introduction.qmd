@@ -3,11 +3,11 @@ title: Introduction
 output-file: index
 ---
 
-### 1.1 In Vivo Imaging Systems
+## 1.1 In Vivo Imaging Systems
 
-### 1.2 Flourescence Imaging
+## 1.2 Flourescence Imaging
 
-### 1.3 Laser Speckle Contrast Imaging
+## 1.3 Laser Speckle Contrast Imaging
 
 
 The introduction should contain background information to help a reader understand the context for the work that will be presented in the remaining sections of the report.

@@ -3,12 +3,12 @@ title: Methods
 output-file: index
 ---
 
-### 2.1 Physical Construction
+## 2.1 Physical Construction
 
-### 2.2 Electrical Components and Software
+## 2.2 Electrical Components and Software
 
-### 2.3 Experiments
-## 2.3.1 Verification
-## 2.3.2 FITC
-## 2.3.3 LSCI
+## 2.3 Experiments
+### 2.3.1 Verification
+### 2.3.2 FITC
+### 2.3.3 LSCI
 

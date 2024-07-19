@@ -4,11 +4,11 @@ output: index
 jupyter: python3
 ---
 
-### 3.1 System Verification and Setup
+## 3.1 System Verification and Setup
 
-### 3.2 Flourescence Imaging
+## 3.2 Flourescence Imaging
 
-### 3.3 Laser Speckle Contrast Imaging
+## 3.3 Laser Speckle Contrast Imaging
 
 
 
