@@ -1,0 +1,17 @@
+---
+title: Abstract
+output-file: index
+---
+
+As a reminder, the abstract should be a short summary of the main results of the project.
+
+It should:
+
+- Explain to the reader what they will learn from the report
+- State the main **quantitative** result of the report
+
+
+It should not:
+
+- Be longer than 200 words
+- Contain references.

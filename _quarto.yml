@@ -1,0 +1,30 @@
+project:
+  type: book
+book:
+  title: "Quarto Template Report"
+  author:
+    - name: Hailey Knolton
+      email: hknolton@g.hmc.edu
+
+  date: 2024-07-11
+  chapters:
+    - index.qmd
+    - sections/abstract/abstract.qmd
+    - sections/introduction/introduction.qmd
+    - sections/results/results.qmd
+    - sections/conclusion/conclusion.qmd
+    - sections/acknowledgements/acknowledgements.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+  pdf: default
+
+bibliography: references.bib
+csl: ieee.csl
+
+
+
+

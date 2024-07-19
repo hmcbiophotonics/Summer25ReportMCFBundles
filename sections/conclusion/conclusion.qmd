@@ -1,0 +1,9 @@
+---
+title: Conclusion
+output-file: index
+---
+
+The conclusion summaries the main results of your paper.
+It generally mirrors the abstract, but in slightly more detail.
+
+It is also common for the conclusion to include a discussion of the data, limitations of the work, and directions for future work.

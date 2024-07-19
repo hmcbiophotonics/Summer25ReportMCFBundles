@@ -1,0 +1,48 @@
+---
+title: "Quarto Report Template"
+html:
+  number-sections: false
+---
+
+This Quarto project is a template that you can use for developing your own final report.
+It suggest a potential structure along with some demonstrations of the advantages of using Quarto for technical documentation (e.g., in-line data processing and plot generation, references, clean formatting, figures, etc.)
+
+
+You can find the source code for the whole project in the accompanying Github repo.
+
+If you have questions or problems with getting it up and running on your own personal machine, the best way to get help is to open a new issue on the Github repo.
+
+## File Structure {.unnumbered}
+
+The suggested structure for this repository is designed to maintain clarity and keep related files together.
+
+```txt
+.
+├── _book
+├── _environment.yml
+├── _quarto.yml
+├── _site
+├── ieee.csl
+├── index.qmd
+├── references.bib
+├── sections
+│   ├── abstract
+│   │   └── abstract.qmd
+│   ├── acknowledgements
+│   │   └── acknowledgements.qmd
+│   ├── conclusion
+│   │   └── conclusion.qmd
+│   ├── introduction
+│   │   ├── images
+│   │   └── introduction.qmd
+│   ├── references
+│   └── results
+│       ├── data
+│       │   └── test_data.mat
+│       ├── images
+│       │   └── test_data_plot.png
+│       └── results.qmd
+└── styles.css
+```
+
+Tree diagram created using [tree.nathanfriend.io](tree.nathanfriend.io).

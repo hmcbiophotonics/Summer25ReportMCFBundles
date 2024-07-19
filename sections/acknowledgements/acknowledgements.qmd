@@ -1,0 +1,14 @@
+---
+title: Acknowledgments
+output-file: index
+---
+
+The acknowledgements section should always recognize the funding sources which supported the work.
+This is particularly important for research funded by organizations like the National Science Foundation (NSF) or the National Institutes of Health (NIH).
+Acknowledging funding properly is very important, so make sure to check in with your PI if you have any questions and to confirm that you have properly recognized the funding sources.
+
+## Funding Acknowledgement
+
+A sample acknowledgement of funding by an NSF grant might read something like the following.
+
+> This research was supported by the National Science Foundation under Grant No. [Your Grant Number]. The authors would like to thank [any other contributors, institutions, or facilities] for their support and collaboration. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.”

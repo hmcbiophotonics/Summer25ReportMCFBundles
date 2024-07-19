@@ -1,0 +1,46 @@
+---
+title: Introduction
+output-file: index
+---
+
+The introduction should contain background information to help a reader understand the context for the work that will be presented in the remaining sections of the report.
+Typically, an introduction contains a number of references to prior work to help the reader understand the relevant literature that the project is building upon.
+
+## References in Quarto
+In Quarto, you can manage references using BibTeX.
+To do so, you should create a `reference.bib` file in the root directory of your project.
+This file will contain BibTeX entries for your citations.
+
+For example, this project contains an example [`references.bib`](../../references.bib) file containing a single reference.
+
+```{tex}
+@article{goodman1976some,
+  title={Some fundamental properties of speckle},
+  author={Goodman, Joseph W},
+  journal={JOSA},
+  volume={66},
+  number={11},
+  pages={1145--1150},
+  year={1976},
+  publisher={Optica Publishing Group}
+}
+```
+
+To link the references file we need to include two new entries in the [`_quarto.yml`](../../_quarto.yml) file.
+
+```{yml}
+bibliography: references.bib
+csl: ieee.csl
+```
+
+These lines tell Quarto where to find the `.bib` file and what citation style to use (controlled by the citation style with a `.csl` file).
+In this project we use an IEEE style.
+
+To cite the reference in the main text, type the `@` symbol followed by the `citekey`. 
+In this case, that would be `@goodman1976some`.
+
+Here is an example.
+
+> The probability distribution of a linearly polarized, fully-developed speckle pattern follows a negative exponential distribution @goodman1976some.
+
+When Quarto renders the document, it will place a citation in place of the `@citekey` pattern and automatically include a linked footnote and a list of references at the bottom.
