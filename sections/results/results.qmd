@@ -4,6 +4,14 @@ output: index
 jupyter: python3
 ---
 
+### 3.1 System Verification and Setup
+
+### 3.2 Flourescence Imaging
+
+### 3.3 Laser Speckle Contrast Imaging
+
+
+
 The advantage to using Quarto as compared to another method of documenting your work is that you can include executable Python code inline with your project.
 This means that you can provide your data and have your figures re-render without needing to execute separately and then include them into the project.
 

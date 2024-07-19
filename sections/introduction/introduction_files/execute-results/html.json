@@ -1,0 +1,12 @@
+{
+  "hash": "7980185180d3beb65d76fd53d19188d2",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Introduction\noutput-file: index\n---\n\n\n\n\n\n\nThe introduction should contain background information to help a reader understand the context for the work that will be presented in the remaining sections of the report.\nTypically, an introduction contains a number of references to prior work to help the reader understand the relevant literature that the project is building upon.\n\n## References in Quarto\nIn Quarto, you can manage references using BibTeX.\nTo do so, you should create a `reference.bib` file in the root directory of your project.\nThis file will contain BibTeX entries for your citations.\n\nFor example, this project contains an example [`references.bib`](../../references.bib) file containing a single reference.\n\n\n\n\n\n\n```{tex}\n@article{goodman1976some,\n  title={Some fundamental properties of speckle},\n  author={Goodman, Joseph W},\n  journal={JOSA},\n  volume={66},\n  number={11},\n  pages={1145--1150},\n  year={1976},\n  publisher={Optica Publishing Group}\n}\n```\n\n\n\n\n\n\nTo link the references file we need to include two new entries in the [`_quarto.yml`](../../_quarto.yml) file.\n\n\n\n\n\n\n```{yml}\nbibliography: references.bib\ncsl: ieee.csl\n```\n\n\n\n\n\n\nThese lines tell Quarto where to find the `.bib` file and what citation style to use (controlled by the citation style with a `.csl` file).\nIn this project we use an IEEE style.\n\nTo cite the reference in the main text, type the `@` symbol followed by the `citekey`. \nIn this case, that would be `@goodman1976some`.\n\nHere is an example.\n\n> The probability distribution of a linearly polarized, fully-developed speckle pattern follows a negative exponential distribution @goodman1976some.\n\nWhen Quarto renders the document, it will place a citation in place of the `@citekey` pattern and automatically include a linked footnote and a list of references at the bottom.\n\n",
+    "supporting": [
+      "introduction_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
