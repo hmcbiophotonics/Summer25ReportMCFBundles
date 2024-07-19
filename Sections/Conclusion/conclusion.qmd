@@ -1,4 +1,0 @@
----
-title: Conclusion
-output-file: index
----
