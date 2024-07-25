@@ -29,7 +29,271 @@ Fig. # shows the normalized pixel intensities of all ten concentrations of FITC 
 
 ### Simulation
 
-Using the process described in Section 2.3.3, analysis on simulated speckle images and the effect of filtering was run. Fig. # depicts the simulated results for a filter with cutoff frequency of N4, where N denotes the size of the speckle image in pixels, while Figures # and # show the results for cutoff frequency of N8 and N16, respectively. As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N4 results in a filtered speckle size of 2 pixels, N8 results in a filtered speckle size of 4 pixels, and N16 results in a filtered speckle size of 8 pixels, as shown in Figures #x, #x, and #x. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter's cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. #x shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N4, while Fig. #x shows an amplitude peak at 0.1 for a cutoff frequency of N16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency, as shown in Figures #x, #x, and #x. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject's roughness or uniformity.
+Using the process described in Section 3.3.3, analysis on simulated speckle images and the effect of filtering was run. Fig. # depicts the simulated results for a filter with cutoff frequency of N4, where N denotes the size of the speckle image in pixels, while Figures # and # show the results for cutoff frequency of N8 and N16, respectively. 
+
+#### Create a Simulated Speckle Image
+
+```{python}
+# Import the necessary Python packages
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import os
+from PIL import Image
+
+def ft2(im):
+    """
+    Takes the fourier transform
+    """
+    return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(im)))
+
+# Function for Inverse Fourier Transform
+def ift2(im):
+    """
+    Takes the inverse fourier transform
+    """
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
+
+# Generate a speckle pattern
+N = 255  # Size of the speckle pattern
+a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
+```
+
+#### Create a filter and Apply it to the Speckle Image
+
+```{python}
+# Compute amplitude, phase and intensity of the original speckle pattern
+amplitude = np.abs(a)
+phase = np.angle(a)
+intensity = amplitude **2
+
+# Fourier transform of the speckle field
+A = ft2(a)
+# Create a circular low-pass filter
+x = np.linspace(-N/2, N/2, N)
+y = np.linspace(-N/2, N/2, N)
+X, Y = np.meshgrid(x, y)
+radius = np.sqrt(X**2 + Y**2)
+cutoff = N/4  # Adjust the cutoff frequency to control the speckle size
+filter = radius < cutoff
+
+# Apply the low-pass filter
+A_filtered = A * filter
+
+# Inverse Fourier transform back to the spatial domain
+a_filtered = ift2(A_filtered)
+
+
+# Compute the amplitude, phase and intensity of the filtered speckle pattern
+amplitude_filtered = np.abs(a_filtered)
+phase_filtered = np.angle(a_filtered)
+intensity_filtered = amplitude_filtered **2
+
+```
+
+#### Compute the Autocorrelation and Speckle Size
+```{python}
+
+# Compute autocorrelation of the original and filtered speckle patterns
+autocorrelation_original = ift2(ft2(intensity) * np.conj(ft2(intensity)))
+autocorrelation_filtered = ift2(ft2(intensity_filtered) * np.conj(ft2(intensity_filtered)))
+
+autocorrelation_original = np.abs(autocorrelation_original)  # Take the magnitude
+autocorrelation_filtered = np.abs(autocorrelation_filtered)  # Take the magnitude
+
+# Normalize the autocorrelations for better visualization
+autocorrelation_original /= autocorrelation_original.max()
+autocorrelation_filtered /= autocorrelation_filtered.max()
+
+# The code below is for finding the speckle sizes of the images
+
+# Get the slice of the autocorrelation in line with the peak
+central_slice_original = autocorrelation_original[N//2, :]
+central_slice_filtered = autocorrelation_filtered[N//2, :]
+
+# Find the halfway point between the maximum and the steady state
+half_max_original = ((central_slice_original.max() - central_slice_original.min()) / 2 ) + central_slice_original.min()
+half_max_filtered = ((central_slice_filtered.max() - central_slice_filtered.min()) / 2 ) + central_slice_filtered.min()
+
+# Find all of the pixels above the halfway point
+indices_original = np.where(central_slice_original >= half_max_original)[0]
+indices_filtered = np.where(central_slice_filtered >= half_max_filtered)[0]
+
+# Find the width of the peak at the halfway point
+if indices_original.size == 1:
+	speckle_size_original = 1
+else:
+	speckle_size_original = indices_original[-1] - indices_original[0]
+	
+if indices_filtered.size == 1:
+	speckle_size_filtered = 1
+else:
+	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
+
+# Print the speckle sizes
+print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
+print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
+
+
+# Rayleigh Distribution for the amplitude histograms
+flat = np.abs(amplitude.flatten())
+flat_fil = np.abs(amplitude_filtered.flatten())
+
+sigma = np.sqrt(np.mean(flat**2) / 2)
+sigma_fil = np.sqrt(np.mean(flat_fil**2) / 2)
+
+x = np.linspace(0, np.max(flat), 255)
+x_fil = np.linspace(0, np.max(flat_fil), 255)
+
+ray = (x / sigma**2) * np.exp(-x**2 / (2 * sigma**2))
+ray_fil = (x_fil / sigma_fil**2) * np.exp(-x_fil**2 / (2 * sigma_fil**2))
+
+
+# Zoom into the autocorrelations
+zoom = 100
+center = np.array(autocorrelation_original.shape) // 2
+center_fil = np.array(autocorrelation_filtered.shape) // 2
+
+zoomRegion = (slice(center[0]-zoom, center[0]+zoom), slice(center[1]-zoom, center[1]+zoom))
+zoomRegion_fil = (slice(center_fil[0]-zoom, center_fil[0]+zoom), slice(center_fil[1]-zoom, center_fil[1]+zoom))
+
+autoZoom = autocorrelation_original[zoomRegion]
+autoZoom_fil = autocorrelation_filtered[zoomRegion_fil]
+```
+
+#### Create plots
+```{python}
+
+def add_colorbar(him, ax, cbar_title=""):
+    """
+    This function adds a nicely-formatted colorbar
+    """
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(him, cax=cax)
+    cbar.set_label(cbar_title, rotation=270, labelpad=15)
+
+# Figure for all of the original speckle pattern info
+fig, o = plt.subplots(ncols=3, nrows=2, figsize=(20,18))
+
+# Plot the original amplitude
+im_amp = o[0, 0].imshow(amplitude, cmap='gray')
+o[0, 0].set_title('Original Speckle Field Amplitude')
+add_colorbar(im_amp, o[0, 0], "Amplitude [a.u.]")
+
+# Plot the original phase
+im_phase = o[0, 1].imshow(phase, cmap='gray')
+o[0, 1].set_title('Original Speckle Field Phase')
+add_colorbar(im_phase, o[0, 1], "Phase [rad]")
+
+# Plot the original intensity
+im_int = o[0, 2].imshow(intensity, cmap='gray')
+o[0, 2].set_title('Original Speckle Field Intensity')
+add_colorbar(im_int, o[0, 2], "Intensity [a.u.]")
+
+# Plot histogram of the original amplitude with Rayleigh
+o[1, 0].hist(flat, bins=50, density=True, color='black', label='Speckle Amplitude')
+o[1, 0].plot(x, ray, 'r-', lw=2, label='Rayleih Fit')
+o[1, 0].set_title('Histogram of Original Amplitude')
+o[1, 0].set_xlabel('Amplitude [a.u.]')
+o[1, 0].set_ylabel('Frequency')
+
+# Plot histogram of the original phase
+o[1, 1].hist(phase.ravel(), bins=50, color='black')
+o[1, 1].set_title('Histogram of Original Phase')
+o[1, 1].set_xlabel('Phase [rad]')
+o[1, 1].set_ylabel('Frequency')
+
+# Plot histogram of the original intensity
+o[1, 2].hist(intensity.ravel(), bins=50, color='black')
+o[1, 2].set_title('Histogram of Original Intensity')
+o[1, 2].set_xlabel('Intensity [a.u.]')
+o[1, 2].set_ylabel('Frequency')
+
+# Figure for all of the filtered speckle pattern info
+fig, f = plt.subplots(ncols=3, nrows=2, figsize=(20,18))
+
+# Plot the filtered amplitude
+im_amp_filtered = f[0, 0].imshow(amplitude_filtered, cmap='gray')
+f[0, 0].set_title('Filtered Speckle Field Amplitude')
+add_colorbar(im_amp_filtered, f[0, 0], "Amplitude [a.u.]")
+
+# Plot the filtered phase
+im_phase_filtered = f[0, 1].imshow(phase_filtered, cmap='gray')
+f[0, 1].set_title('Filtered Speckle Field Phase')
+add_colorbar(im_phase_filtered, f[0, 1], "Phase [rad]")
+
+# Plot the filtered intensity
+im_int_filtered = f[0, 2].imshow(intensity_filtered, cmap='gray')
+f[0, 2].set_title('Filtered Speckle Field Intensity')
+add_colorbar(im_int_filtered, f[0, 2], "Intensity [a.u.]")
+
+# Plot histogram of the filtered amplitude with Rayleigh
+f[1, 0].hist(flat_fil, bins=50, density=True, color='black', label='Speckle Amplitude')
+f[1, 0].plot(x_fil, ray_fil, 'r-', lw=2, label='Rayleih Fit')
+f[1, 0].set_title('Histogram of Filtered Amplitude')
+f[1, 0].set_xlabel('Amplitude [a.u.]')
+f[1, 0].set_ylabel('Frequency')
+
+# Plot histogram of the filtered phase
+f[1, 1].hist(phase_filtered.ravel(), bins=50, color='black')
+f[1, 1].set_title('Histogram of Filtered Phase')
+f[1, 1].set_xlabel('Phase [rad]')
+f[1, 1].set_ylabel('Frequency')
+
+# Plot histogram of the filtered intensity
+f[1, 2].hist(intensity_filtered.ravel(), bins=50, color='black')
+f[1, 2].set_title('Histogram of Filtered Intensity')
+f[1, 2].set_xlabel('Intensity [a.u.]')
+f[1, 2].set_ylabel('Frequency')
+
+# Fiure fo comparing the autocorrelations of the original and filtered speckle patterns
+fig, a = plt.subplots(ncols=2, nrows=3, figsize=(10,20))
+
+# Plot the original amplitude
+im_amp = a[0, 0].imshow(amplitude, cmap='gray')
+a[0, 0].set_title('Original Speckle Field Amplitude')
+add_colorbar(im_amp, a[0, 0], "Amplitude [a.u.]")
+
+# Plot the filtered amplitude
+im_amp_filtered = a[0, 1].imshow(amplitude_filtered, cmap='gray')
+a[0, 1].set_title('Filtered Speckle Field Amplitude')
+add_colorbar(im_amp_filtered, a[0, 1], "Amplitude [a.u.]")
+
+# Plot the autocorrelation of the original speckle pattern
+im_autoZoom = a[1, 0].imshow(autoZoom, cmap='gray')
+a[1, 0].set_title('Autocorrelation of Original Speckle Pattern')
+add_colorbar(im_autoZoom, a[1, 0], "Intensity [a.u.]")
+
+# Plot the autocorrelation of the filtered speckle pattern
+im_autoZoom_fil = a[1, 1].imshow(autoZoom_fil, cmap='gray')
+a[1, 1].set_title('Autocorrelation of Filtered Speckle Pattern')
+add_colorbar(im_autoZoom_fil, a[1, 1], "Intensity [a.u.]")
+
+# Plot the central slice of the original autocorrelation (zoomed)
+a[2,0].plot(central_slice_original, color='black')
+a[2,0].axhline(y=half_max_original, color='red', linestyle='--')
+a[2,0].set_title('Central Slice of Original Autocorrelation')
+a[2,0].set_xlabel('Pixel')
+a[2,0].set_ylabel('Intensity [a.u.]')
+a[2,0].text(0.5, 0.9, f'Speckle size: {speckle_size_original} pixels', color='red', transform=a[2,0].transAxes)
+
+# Plot the central slice of the filtered autocorrelation (zoomed)
+a[2,1].plot(central_slice_filtered, color='black')
+a[2,1].axhline(y=half_max_filtered, color='red', linestyle='--')
+a[2,1].set_title('Central Slice of Filtered Autocorrelation')
+a[2,1].set_xlabel('Pixel')
+a[2,1].set_ylabel('Intensity [a.u.]')
+a[2,1].text(0.5, 0.9, f'Speckle size: {speckle_size_filtered} pixels', color='red', transform=a[2,1].transAxes)
+
+# Adjust layout
+plt.tight_layout()
+# Show the plot
+plt.show()
+
+```
+
+As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N4 results in a filtered speckle size of 2 pixels, N8 results in a filtered speckle size of 4 pixels, and N16 results in a filtered speckle size of 8 pixels, as shown in Figures #x, #x, and #x. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter's cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. #x shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N4, while Fig. #x shows an amplitude peak at 0.1 for a cutoff frequency of N16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency, as shown in Figures #x, #x, and #x. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject's roughness or uniformity.
 
 ### Physical Tests
 The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of XX ml/hr, XX ml/hr, XX ml/hr, and XX ml/hr. The resulting speckle images, LSCI reproductions and intensity histograms are shown in Figures #, #, #, and #. 
