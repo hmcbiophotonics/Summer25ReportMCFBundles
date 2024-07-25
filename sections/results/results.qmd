@@ -7,36 +7,36 @@ header-includes:
 ---
 
 
-# System Verification and Setup {#system-verification-and-setup}
+## System Verification and Setup {#system-verification-and-setup}
 
-## Changing Exposure Time
+### Changing Exposure Time
 
 In Fig. #, there is a positive, non-linear relationship between exposure time and pixel intensity. Initially there is a large increase in pixel intensity as exposure time increases and this is most likely because as exposure time increases, more photons will be detected by the pixels in the camera. As exposure time continues to increase, the increase in pixel intensity starts to decrease. This is most likely because the pixels can only hold a certain amount of photons and when a pixel has stored its maximum amount of photons, it has reached its saturation point. As more photons are being detected by the pixels from the increasing exposure times, the pixels are getting closer to their saturation point (Hasinoff). This plot also has a small error across the different trials, suggesting that the exposure times are precise.
 
-## Changing Brightness Level
+### Changing Brightness Level
 
 In both of the plots shown in Fig. #, there is a positive trend between brightness level and pixel intensity. When the exposure time was set to 0.01 seconds (Fig. # a), the pixel intensity increases linearly and then flattens out around 600 arbitrary units. This number matches with the intensity when exposure time is 0.01 seconds in Fig. # above, suggesting that the exposure time has a significant impact on the resulting plot of brightness level vs pixel intensity. When the exposure time is increased to 0.1 seconds in Fig. # b, the linear portion of the graph seems to shift to higher brightness levels and starts to flatten out around 1000 arbitrary units. This intensity value also agrees with the intensity value of an exposure time of 0.1 seconds in Fig. # above. The trend that this data supports is that the camera will most accurately capture LED brightness when the brightness level is low and the exposure time is quick and when the brightness level is high and the exposure time is slow. There is also a very small error across the different trials, suggesting that the camera is capturing the LED brightness precisely.
 
-## Measuring From a Photodiode
+### Measuring From a Photodiode
 
 Both plots in Fig. # depict a positive, non-linear relationship between brightness and wattage from the photodiode. Fig. # a shows increasing brightness level from the NeoPixel controls while Figure # b shows increasing tuple value, or color code value. The plots are extremely similar in both shape and in error. The error across the different trials are a lot larger than in Fig.s # and #. This is because the photodiode is measuring the actual LED output rather than what the camera is capturing the brightness to be. The LEDs being used are off the shelf and relatively cheap, so it was expected that they would be less precise than more expensive LED options.
 
-# Flourescence Imaging  {#fluorescence-imaging}
+## Flourescence Imaging  {#fluorescence-imaging}
 
 Fig. # shows the normalized pixel intensities of all ten concentrations of FITC for eight different exposure times. As exposure time and concentration increases, the pixel intensity also increases. The 100 milliseconds, or 0.1 seconds, exposure time best represents the expected relationship between concentration and pixel intensity (green curve). As seen in Fig. #, the lower concentrations of FITC are a lot less fluorescent than the higher concentrations. The green curve shows a large increase in pixel intensity in the higher concentrations, with it flattening out at the maximum value of 1 in the normalized plot. This maximum value of 1 corresponds to 1023 arbitrary units. The slower exposure times (purple and blue curves) also show the trend to an extent. These larger exposure times mean that the images captured by the camera are super bright, so most of the concentrations have large intensity values. The faster exposure times have the opposite effect. The images captured by the camera are super dark, and the pixel intensity values are low. The intensity values for each concentration represent how fluorescent each concentration is. Based on this data, the higher concentrations of FITC are more fluorescent than the lower concentrations.
 
-# Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
+## Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
 
-##  Simulation
+### Simulation
 
 Using the process described in Section 2.3.3, analysis on simulated speckle images and the effect of filtering was run. Fig. # depicts the simulated results for a filter with cutoff frequency of N4, where N denotes the size of the speckle image in pixels, while Figures # and # show the results for cutoff frequency of N8 and N16, respectively. As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N4 results in a filtered speckle size of 2 pixels, N8 results in a filtered speckle size of 4 pixels, and N16 results in a filtered speckle size of 8 pixels, as shown in Figures #x, #x, and #x. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter's cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. #x shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N4, while Fig. #x shows an amplitude peak at 0.1 for a cutoff frequency of N16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency, as shown in Figures #x, #x, and #x. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject's roughness or uniformity.
 
-## Physical Tests
+### Physical Tests
 The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of XX ml/hr, XX ml/hr, XX ml/hr, and XX ml/hr. The resulting speckle images, LSCI reproductions and intensity histograms are shown in Figures #, #, #, and #. 
 
 MORE ONCE WE HAVE CONCLUSIVE RESULTS…
 
-# Additional Capabilities
+## Additional Capabilities
 
 The system was successful in taking time lapse images over an extended period of time and could be used for a broad range of biological imaging applications. The time lapse of the Tobacco Hornworm growth resulted in 45 images over the span of 9 days, with 5 hours between each image. An example of one week’s worth of growth is shown in Fig. #, and an image of the full box on the first and last day is shown in Fig. #. 
 While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. # and #. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al [Branning].
