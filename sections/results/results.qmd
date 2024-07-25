@@ -7,7 +7,7 @@ header-includes:
 ---
 
 
-## System Verification and Setup {#system-verification-and-setup}
+# System Verification and Setup {#system-verification-and-setup}
 
 ## Changing Exposure Time
 
@@ -21,11 +21,11 @@ In both of the plots shown in Fig. #, there is a positive trend between brightne
 
 Both plots in Fig. # depict a positive, non-linear relationship between brightness and wattage from the photodiode. Fig. # a shows increasing brightness level from the NeoPixel controls while Figure # b shows increasing tuple value, or color code value. The plots are extremely similar in both shape and in error. The error across the different trials are a lot larger than in Fig.s # and #. This is because the photodiode is measuring the actual LED output rather than what the camera is capturing the brightness to be. The LEDs being used are off the shelf and relatively cheap, so it was expected that they would be less precise than more expensive LED options.
 
-## Flourescence Imaging  {#fluorescence-imaging}
+# Flourescence Imaging  {#fluorescence-imaging}
 
 Fig. # shows the normalized pixel intensities of all ten concentrations of FITC for eight different exposure times. As exposure time and concentration increases, the pixel intensity also increases. The 100 milliseconds, or 0.1 seconds, exposure time best represents the expected relationship between concentration and pixel intensity (green curve). As seen in Fig. #, the lower concentrations of FITC are a lot less fluorescent than the higher concentrations. The green curve shows a large increase in pixel intensity in the higher concentrations, with it flattening out at the maximum value of 1 in the normalized plot. This maximum value of 1 corresponds to 1023 arbitrary units. The slower exposure times (purple and blue curves) also show the trend to an extent. These larger exposure times mean that the images captured by the camera are super bright, so most of the concentrations have large intensity values. The faster exposure times have the opposite effect. The images captured by the camera are super dark, and the pixel intensity values are low. The intensity values for each concentration represent how fluorescent each concentration is. Based on this data, the higher concentrations of FITC are more fluorescent than the lower concentrations.
 
-## Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
+# Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
 
 ##  Simulation
 
