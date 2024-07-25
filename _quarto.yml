@@ -1,12 +1,13 @@
 project:
   type: book
 book:
-  title: "Quarto Template Report"
+  title: "OpenIVIS Summer 2024 Report"
   author:
     - name: Hailey Knolton
       email: hknolton@g.hmc.edu
     - name: Ruby Peterman
       email: rpeterman@g.hmc.edu
+
 
   date: 2024-07-11
   chapters:
@@ -22,7 +23,9 @@ format:
   html:
     theme: cosmo
     css: styles.css
+    number-sections: true
     toc: true
+    toc-depth: 3
   pdf: default
 
 bibliography: references.bib

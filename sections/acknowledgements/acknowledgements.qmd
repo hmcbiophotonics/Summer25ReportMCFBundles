@@ -1,13 +1,19 @@
 ---
 title: Acknowledgments
 output-file: index
+header-includes:
+  - \setcounter{page}{7}  
 ---
 
-The acknowledgements section should always recognize the funding sources which supported the work.
-This is particularly important for research funded by organizations like the National Science Foundation (NSF) or the National Institutes of Health (NIH).
-Acknowledging funding properly is very important, so make sure to check in with your PI if you have any questions and to confirm that you have properly recognized the funding sources.
 
-## Funding Acknowledgement
+This research was supported by the Silicon Valley Community Foundation under Grant No. 2022-251322. The authors would like to thank the Colorado School of Mines Cash Lab, Harvey Mudd College, Daniel A. Guerra, Jenny Nguyen, Xavier Walter, and Jacob Staimpel for their support and collaboration.
+
+- Daniel A. Guerra - HMC Chemistry Laboratory and Stockroom Manager
+- Jenny Nguyen - HMC Biology Laboratory Manager
+- Xavier Walter - HMC Staff Engineer 
+- Jacob Staimpel - HMC Engineering Instructional Support Coordinator
+
+## Funding Acknowledgement 
 
 A sample acknowledgement of funding by an NSF grant might read something like the following.
 

@@ -1,48 +1,16 @@
 ---
-title: "Quarto Report Template"
+title: "OpenIVIS Summer 2024 Quarto Report"
 html:
   number-sections: false
+header-includes:
+  - \setcounter{page}{1} 
 ---
-
-This Quarto project is a template that you can use for developing your own final report.
-It suggest a potential structure along with some demonstrations of the advantages of using Quarto for technical documentation (e.g., in-line data processing and plot generation, references, clean formatting, figures, etc.)
-
-
-You can find the source code for the whole project in the accompanying Github repo.
-
-If you have questions or problems with getting it up and running on your own personal machine, the best way to get help is to open a new issue on the Github repo.
-
-## File Structure {.unnumbered}
-
-The suggested structure for this repository is designed to maintain clarity and keep related files together.
-
-```txt
-.
-├── _book
-├── _environment.yml
-├── _quarto.yml
-├── _site
-├── ieee.csl
-├── index.qmd
-├── references.bib
-├── sections
-│   ├── abstract
-│   │   └── abstract.qmd
-│   ├── acknowledgements
-│   │   └── acknowledgements.qmd
-│   ├── conclusion
-│   │   └── conclusion.qmd
-│   ├── introduction
-│   │   ├── images
-│   │   └── introduction.qmd
-│   ├── references
-│   └── results
-│       ├── data
-│       │   └── test_data.mat
-│       ├── images
-│       │   └── test_data_plot.png
-│       └── results.qmd
-└── styles.css
-```
-
-Tree diagram created using [tree.nathanfriend.io](tree.nathanfriend.io).
+# Table of Contents {.unnumbered}
+1. [Index](index.qmd)
+2. [Abstract](/sections/abstract/abstract.qmd)
+3. [Introduction](/sections//introduction/introduction.qmd) 
+    3.1 [In Vivo Imaging Systems](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)
+4. [Methods](/sections//methods/methods.qmd)
+5. [Results](/sections/results/results.qmd)
+6. [Conclusion](/sections/conclusion/conclusion.qmd)
+7. [Acknowledgements](/sections/acknowledgements/acknowledgements.qmd)

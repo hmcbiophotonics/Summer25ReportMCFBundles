@@ -1,8 +1,11 @@
 ---
 title: Conclusion
 output-file: index
+header-includes:
+  - \setcounter{page}{6}  
 ---
 
+# Conclusion  {#conclusion}
 The conclusion summaries the main results of your paper.
 It generally mirrors the abstract, but in slightly more detail.
 
