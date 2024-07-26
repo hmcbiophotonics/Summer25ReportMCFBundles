@@ -6,9 +6,25 @@ header-includes:
 ---
 
 ## Bill of Materials
+Access the bill of materials through the [Github Repo](https://github.com/hmcbiophotonics/openIVIS/blob/main/Summer%202024/Bill%20of%20Materials.xlsx) or in the table below.
+```{python}
+#| echo: false
+import pandas as pd
 
+# Local path to the Excel file
+file_path = "Bill of Materials.xlsx"
+
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+# Display the table
+df
+```
 ## Python Packages
+The full list of Python packages needed is available below.
 
 ## Python Code
+The python files can be accessed via the project's [GitHub Repo](https://github.com/hmcbiophotonics/openIVIS/tree/main/Summer%202024/raspberryPiFiles)
 
 ## CAD Files
+The CAD files can be accessed via the project's [GitHub Repo](https://github.com/hmcbiophotonics/openIVIS/tree/main/Summer%202024/Physical%20Components)
