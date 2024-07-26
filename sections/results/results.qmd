@@ -459,7 +459,7 @@ def ift2(im):
     return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
 
 # Generate a speckle pattern
-N = 255  # Size of the speckle pattern
+N = 200  # Size of the speckle pattern
 a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
 ```
 
@@ -559,7 +559,7 @@ ray_fil = (x_fil / sigma_fil**2) * np.exp(-x_fil**2 / (2 * sigma_fil**2))
 
 
 # Zoom into the autocorrelations
-zoom = 100
+zoom = 25
 center = np.array(autocorrelation_original.shape) // 2
 center_fil = np.array(autocorrelation_filtered.shape) // 2
 
@@ -632,6 +632,371 @@ plt.close(fig)
 
 ::: {#fig-test-data}
 ![](./images/LSCISimulation.png)
+
+The simulated and filtered speckle images.
+:::
+
+#### Cutoff Frequency = N/8
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckleSimulation.py"
+
+# Import the necessary Python packages
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import os
+from PIL import Image
+
+def ft2(im):
+    """
+    Takes the fourier transform
+    """
+    return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(im)))
+
+# Function for Inverse Fourier Transform
+def ift2(im):
+    """
+    Takes the inverse fourier transform
+    """
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
+
+# Generate a speckle pattern
+N = 200  # Size of the speckle pattern
+a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
+ 
+# Compute amplitude, phase and intensity of the original speckle pattern
+amplitude = np.abs(a)
+phase = np.angle(a)
+intensity = amplitude **2
+
+# Fourier transform of the speckle field
+A = ft2(a)
+# Create a circular low-pass filter
+x = np.linspace(-N/2, N/2, N)
+y = np.linspace(-N/2, N/2, N)
+X, Y = np.meshgrid(x, y)
+radius = np.sqrt(X**2 + Y**2)
+cutoff = N/8  # Adjust the cutoff frequency to control the speckle size
+filter = radius < cutoff
+
+# Apply the low-pass filter
+A_filtered = A * filter
+
+# Inverse Fourier transform back to the spatial domain
+a_filtered = ift2(A_filtered)
+
+
+# Compute the amplitude, phase and intensity of the filtered speckle pattern
+amplitude_filtered = np.abs(a_filtered)
+phase_filtered = np.angle(a_filtered)
+intensity_filtered = amplitude_filtered **2
+
+# Compute autocorrelation of the original and filtered speckle patterns
+autocorrelation_original = ift2(ft2(intensity) * np.conj(ft2(intensity)))
+autocorrelation_filtered = ift2(ft2(intensity_filtered) * np.conj(ft2(intensity_filtered)))
+
+autocorrelation_original = np.abs(autocorrelation_original)  # Take the magnitude
+autocorrelation_filtered = np.abs(autocorrelation_filtered)  # Take the magnitude
+
+# Normalize the autocorrelations for better visualization
+autocorrelation_original /= autocorrelation_original.max()
+autocorrelation_filtered /= autocorrelation_filtered.max()
+
+# The code below is for finding the speckle sizes of the images
+
+# Get the slice of the autocorrelation in line with the peak
+central_slice_original = autocorrelation_original[N//2, :]
+central_slice_filtered = autocorrelation_filtered[N//2, :]
+
+# Find the halfway point between the maximum and the steady state
+half_max_original = ((central_slice_original.max() - central_slice_original.min()) / 2 ) + central_slice_original.min()
+half_max_filtered = ((central_slice_filtered.max() - central_slice_filtered.min()) / 2 ) + central_slice_filtered.min()
+
+# Find all of the pixels above the halfway point
+indices_original = np.where(central_slice_original >= half_max_original)[0]
+indices_filtered = np.where(central_slice_filtered >= half_max_filtered)[0]
+
+# Find the width of the peak at the halfway point
+if indices_original.size == 1:
+	speckle_size_original = 1
+else:
+	speckle_size_original = indices_original[-1] - indices_original[0]
+	
+if indices_filtered.size == 1:
+	speckle_size_filtered = 1
+else:
+	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
+
+# Print the speckle sizes
+print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
+print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
+
+
+# Rayleigh Distribution for the amplitude histograms
+flat = np.abs(amplitude.flatten())
+flat_fil = np.abs(amplitude_filtered.flatten())
+
+sigma = np.sqrt(np.mean(flat**2) / 2)
+sigma_fil = np.sqrt(np.mean(flat_fil**2) / 2)
+
+x = np.linspace(0, np.max(flat), 255)
+x_fil = np.linspace(0, np.max(flat_fil), 255)
+
+ray = (x / sigma**2) * np.exp(-x**2 / (2 * sigma**2))
+ray_fil = (x_fil / sigma_fil**2) * np.exp(-x_fil**2 / (2 * sigma_fil**2))
+
+
+# Zoom into the autocorrelations
+zoom = 25
+center = np.array(autocorrelation_original.shape) // 2
+center_fil = np.array(autocorrelation_filtered.shape) // 2
+
+zoomRegion = (slice(center[0]-zoom, center[0]+zoom), slice(center[1]-zoom, center[1]+zoom))
+zoomRegion_fil = (slice(center_fil[0]-zoom, center_fil[0]+zoom), slice(center_fil[1]-zoom, center_fil[1]+zoom))
+
+autoZoom = autocorrelation_original[zoomRegion]
+autoZoom_fil = autocorrelation_filtered[zoomRegion_fil]
+
+def add_colorbar(him, ax, cbar_title=""):
+    """
+    This function adds a nicely-formatted colorbar
+    """
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(him, cax=cax)
+    cbar.set_label(cbar_title, rotation=270, labelpad=15)
+
+# Fiure fo comparing the autocorrelations of the original and filtered speckle patterns
+fig, a = plt.subplots(ncols=2, nrows=3, figsize=(10,20))
+
+# Plot the original amplitude
+im_amp = a[0, 0].imshow(amplitude, cmap='gray')
+a[0, 0].set_title('Original Speckle Field Amplitude')
+add_colorbar(im_amp, a[0, 0], "Amplitude [a.u.]")
+
+# Plot the filtered amplitude
+im_amp_filtered = a[0, 1].imshow(amplitude_filtered, cmap='gray')
+a[0, 1].set_title('Filtered Speckle Field Amplitude')
+add_colorbar(im_amp_filtered, a[0, 1], "Amplitude [a.u.]")
+
+# Plot the autocorrelation of the original speckle pattern
+im_autoZoom = a[1, 0].imshow(autoZoom, cmap='gray')
+a[1, 0].set_title('Autocorrelation of Original Speckle Pattern')
+add_colorbar(im_autoZoom, a[1, 0], "Intensity [a.u.]")
+
+# Plot the autocorrelation of the filtered speckle pattern
+im_autoZoom_fil = a[1, 1].imshow(autoZoom_fil, cmap='gray')
+a[1, 1].set_title('Autocorrelation of Filtered Speckle Pattern')
+add_colorbar(im_autoZoom_fil, a[1, 1], "Intensity [a.u.]")
+
+# Plot the central slice of the original autocorrelation (zoomed)
+a[2,0].plot(central_slice_original, color='black')
+a[2,0].axhline(y=half_max_original, color='red', linestyle='--')
+a[2,0].set_title('Central Slice of Original Autocorrelation')
+a[2,0].set_xlabel('Pixel')
+a[2,0].set_ylabel('Intensity [a.u.]')
+a[2,0].text(0.5, 0.9, f'Speckle size: {speckle_size_original} pixels', color='red', transform=a[2,0].transAxes)
+
+# Plot the central slice of the filtered autocorrelation (zoomed)
+a[2,1].plot(central_slice_filtered, color='black')
+a[2,1].axhline(y=half_max_filtered, color='red', linestyle='--')
+a[2,1].set_title('Central Slice of Filtered Autocorrelation')
+a[2,1].set_xlabel('Pixel')
+a[2,1].set_ylabel('Intensity [a.u.]')
+a[2,1].text(0.5, 0.9, f'Speckle size: {speckle_size_filtered} pixels', color='red', transform=a[2,1].transAxes)
+
+# Adjust layout
+plt.tight_layout()
+# Save the plot
+plt.savefig('images/LSCISimulation2.png')
+plt.close(fig)
+```
+
+::: {#fig-test-data}
+![](./images/LSCISimulation2.png)
+
+The simulated and filtered speckle images.
+:::
+#### Cutoff Frequency = N/16
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckleSimulation.py"
+
+# Import the necessary Python packages
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import os
+from PIL import Image
+
+def ft2(im):
+    """
+    Takes the fourier transform
+    """
+    return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(im)))
+
+# Function for Inverse Fourier Transform
+def ift2(im):
+    """
+    Takes the inverse fourier transform
+    """
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
+
+# Generate a speckle pattern
+N = 200  # Size of the speckle pattern
+a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
+ 
+# Compute amplitude, phase and intensity of the original speckle pattern
+amplitude = np.abs(a)
+phase = np.angle(a)
+intensity = amplitude **2
+
+# Fourier transform of the speckle field
+A = ft2(a)
+# Create a circular low-pass filter
+x = np.linspace(-N/2, N/2, N)
+y = np.linspace(-N/2, N/2, N)
+X, Y = np.meshgrid(x, y)
+radius = np.sqrt(X**2 + Y**2)
+cutoff = N/16  # Adjust the cutoff frequency to control the speckle size
+filter = radius < cutoff
+
+# Apply the low-pass filter
+A_filtered = A * filter
+
+# Inverse Fourier transform back to the spatial domain
+a_filtered = ift2(A_filtered)
+
+
+# Compute the amplitude, phase and intensity of the filtered speckle pattern
+amplitude_filtered = np.abs(a_filtered)
+phase_filtered = np.angle(a_filtered)
+intensity_filtered = amplitude_filtered **2
+
+# Compute autocorrelation of the original and filtered speckle patterns
+autocorrelation_original = ift2(ft2(intensity) * np.conj(ft2(intensity)))
+autocorrelation_filtered = ift2(ft2(intensity_filtered) * np.conj(ft2(intensity_filtered)))
+
+autocorrelation_original = np.abs(autocorrelation_original)  # Take the magnitude
+autocorrelation_filtered = np.abs(autocorrelation_filtered)  # Take the magnitude
+
+# Normalize the autocorrelations for better visualization
+autocorrelation_original /= autocorrelation_original.max()
+autocorrelation_filtered /= autocorrelation_filtered.max()
+
+# The code below is for finding the speckle sizes of the images
+
+# Get the slice of the autocorrelation in line with the peak
+central_slice_original = autocorrelation_original[N//2, :]
+central_slice_filtered = autocorrelation_filtered[N//2, :]
+
+# Find the halfway point between the maximum and the steady state
+half_max_original = ((central_slice_original.max() - central_slice_original.min()) / 2 ) + central_slice_original.min()
+half_max_filtered = ((central_slice_filtered.max() - central_slice_filtered.min()) / 2 ) + central_slice_filtered.min()
+
+# Find all of the pixels above the halfway point
+indices_original = np.where(central_slice_original >= half_max_original)[0]
+indices_filtered = np.where(central_slice_filtered >= half_max_filtered)[0]
+
+# Find the width of the peak at the halfway point
+if indices_original.size == 1:
+	speckle_size_original = 1
+else:
+	speckle_size_original = indices_original[-1] - indices_original[0]
+	
+if indices_filtered.size == 1:
+	speckle_size_filtered = 1
+else:
+	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
+
+# Print the speckle sizes
+print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
+print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
+
+
+# Rayleigh Distribution for the amplitude histograms
+flat = np.abs(amplitude.flatten())
+flat_fil = np.abs(amplitude_filtered.flatten())
+
+sigma = np.sqrt(np.mean(flat**2) / 2)
+sigma_fil = np.sqrt(np.mean(flat_fil**2) / 2)
+
+x = np.linspace(0, np.max(flat), 255)
+x_fil = np.linspace(0, np.max(flat_fil), 255)
+
+ray = (x / sigma**2) * np.exp(-x**2 / (2 * sigma**2))
+ray_fil = (x_fil / sigma_fil**2) * np.exp(-x_fil**2 / (2 * sigma_fil**2))
+
+
+# Zoom into the autocorrelations
+zoom = 25
+center = np.array(autocorrelation_original.shape) // 2
+center_fil = np.array(autocorrelation_filtered.shape) // 2
+
+zoomRegion = (slice(center[0]-zoom, center[0]+zoom), slice(center[1]-zoom, center[1]+zoom))
+zoomRegion_fil = (slice(center_fil[0]-zoom, center_fil[0]+zoom), slice(center_fil[1]-zoom, center_fil[1]+zoom))
+
+autoZoom = autocorrelation_original[zoomRegion]
+autoZoom_fil = autocorrelation_filtered[zoomRegion_fil]
+
+def add_colorbar(him, ax, cbar_title=""):
+    """
+    This function adds a nicely-formatted colorbar
+    """
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(him, cax=cax)
+    cbar.set_label(cbar_title, rotation=270, labelpad=15)
+
+# Fiure fo comparing the autocorrelations of the original and filtered speckle patterns
+fig, a = plt.subplots(ncols=2, nrows=3, figsize=(10,20))
+
+# Plot the original amplitude
+im_amp = a[0, 0].imshow(amplitude, cmap='gray')
+a[0, 0].set_title('Original Speckle Field Amplitude')
+add_colorbar(im_amp, a[0, 0], "Amplitude [a.u.]")
+
+# Plot the filtered amplitude
+im_amp_filtered = a[0, 1].imshow(amplitude_filtered, cmap='gray')
+a[0, 1].set_title('Filtered Speckle Field Amplitude')
+add_colorbar(im_amp_filtered, a[0, 1], "Amplitude [a.u.]")
+
+# Plot the autocorrelation of the original speckle pattern
+im_autoZoom = a[1, 0].imshow(autoZoom, cmap='gray')
+a[1, 0].set_title('Autocorrelation of Original Speckle Pattern')
+add_colorbar(im_autoZoom, a[1, 0], "Intensity [a.u.]")
+
+# Plot the autocorrelation of the filtered speckle pattern
+im_autoZoom_fil = a[1, 1].imshow(autoZoom_fil, cmap='gray')
+a[1, 1].set_title('Autocorrelation of Filtered Speckle Pattern')
+add_colorbar(im_autoZoom_fil, a[1, 1], "Intensity [a.u.]")
+
+# Plot the central slice of the original autocorrelation (zoomed)
+a[2,0].plot(central_slice_original, color='black')
+a[2,0].axhline(y=half_max_original, color='red', linestyle='--')
+a[2,0].set_title('Central Slice of Original Autocorrelation')
+a[2,0].set_xlabel('Pixel')
+a[2,0].set_ylabel('Intensity [a.u.]')
+a[2,0].text(0.5, 0.9, f'Speckle size: {speckle_size_original} pixels', color='red', transform=a[2,0].transAxes)
+
+# Plot the central slice of the filtered autocorrelation (zoomed)
+a[2,1].plot(central_slice_filtered, color='black')
+a[2,1].axhline(y=half_max_filtered, color='red', linestyle='--')
+a[2,1].set_title('Central Slice of Filtered Autocorrelation')
+a[2,1].set_xlabel('Pixel')
+a[2,1].set_ylabel('Intensity [a.u.]')
+a[2,1].text(0.5, 0.9, f'Speckle size: {speckle_size_filtered} pixels', color='red', transform=a[2,1].transAxes)
+
+# Adjust layout
+plt.tight_layout()
+# Save the plot
+plt.savefig('images/LSCISimulation3.png')
+plt.close(fig)
+```
+
+::: {#fig-test-data}
+![](./images/LSCISimulation3.png)
 
 The simulated and filtered speckle images.
 :::
@@ -914,6 +1279,6 @@ The system was successful in taking time lapse images over an extended period of
 A week's worth of growth from one hornworm.
 :::
 
-While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. # and #. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al [Branning].
+While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. # and #. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al @lee2024detection.
 
 
