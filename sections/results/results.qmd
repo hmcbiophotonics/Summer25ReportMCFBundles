@@ -13,19 +13,384 @@ html:
 
 ### Changing Exposure Time
 
-In Fig. #, there is a positive, non-linear relationship between exposure time and pixel intensity. Initially there is a large increase in pixel intensity as exposure time increases and this is most likely because as exposure time increases, more photons will be detected by the pixels in the camera. As exposure time continues to increase, the increase in pixel intensity starts to decrease. This is most likely because the pixels can only hold a certain amount of photons and when a pixel has stored its maximum amount of photons, it has reached its saturation point. As more photons are being detected by the pixels from the increasing exposure times, the pixels are getting closer to their saturation point @hasinoff2021saturation. This plot also has a small error across the different trials, suggesting that the exposure times are precise.
+In Fig. 5.1, there is a positive, non-linear relationship between exposure time and pixel intensity. Initially there is a large increase in pixel intensity as exposure time increases and this is most likely because as exposure time increases, more photons will be detected by the pixels in the camera. As exposure time continues to increase, the increase in pixel intensity starts to decrease. This is most likely because the pixels can only hold a certain amount of photons and when a pixel has stored its maximum amount of photons, it has reached its saturation point. As more photons are being detected by the pixels from the increasing exposure times, the pixels are getting closer to their saturation point @hasinoff2021saturation. This plot also has a small error across the different trials, suggesting that the exposure times are precise.
+
+#### Read and Plot Exposure Values {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from exposure_analysis.py"
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# Load the data
+data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx")
+data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx")
+data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx")
+data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx")
+data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx")
+
+intensity1 = data1.iloc[:, 2]
+intensity2 = data2.iloc[:, 2]
+intensity3 = data3.iloc[:, 2]
+intensity4 = data4.iloc[:, 2]
+intensity5 = data5.iloc[:, 2]
+
+exposure = [10, 5, 1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001]
+
+# Normalize each data set, every 10 data points is a new concentration
+def normalize(exp):
+    min_exp = np.min(exp)
+    max_exp = np.max(exp)
+    return (exp - min_exp) / (max_exp - min_exp)
+
+#exp1 = intensity[:9]  # only 9 values instead of 10 because shifting is wrong and won't work correctly
+exp10 = np.concatenate((intensity1[63:71], intensity2[63:71],intensity3[63:71],intensity4[63:71],intensity5[63:71]))
+exp5 = np.concatenate((intensity1[72:80], intensity2[72:80],intensity3[72:80],intensity4[72:80], intensity5[72:80]))
+exp1 = np.concatenate((intensity1[54:62],intensity2[54:62],intensity3[53:62],intensity4[54:62],intensity5[54:62]))
+exp05 = np.concatenate((intensity1[45:53],intensity2[45:53],intensity3[45:53],intensity4[45:53],intensity5[45:53]))
+exp01 = np.concatenate((intensity1[36:44],intensity2[36:44],intensity3[36:44],intensity4[36:44],intensity5[36:44]))
+exp005 = np.concatenate((intensity1[27:35],intensity2[27:35],intensity3[27:35],intensity4[27:35],intensity5[27:35]))
+exp001 = np.concatenate((intensity1[18:26],intensity2[18:26],intensity3[18:26],intensity4[18:26],intensity5[18:26]))
+exp0005 = np.concatenate((intensity1[9:17],intensity2[9:17],intensity3[9:17],intensity4[9:17],intensity5[9:17]))
+exp0001 = np.concatenate((intensity1[0:8],intensity2[0:8],intensity3[0:8],intensity4[0:8],intensity5[0:9]))
+
+# Statistical Analysis
+list_exp = [exp10, exp5, exp1, exp05, exp01, exp005, exp001, exp0005, exp0001]
+
+meanlist = []
+stdlist = []
+
+#for i in range(0, 8, 1):
+    #lower = 1
+    #upper = 10
+    #data = list_exp[i][lower:upper]
+    #meanlist.append(np.mean(data))
+    #stdlist.append(int(np.std(data)))
+
+for data in list_exp:
+    meanlist.append(np.mean(data))
+    stdlist.append(np.std(data))
+
+# Plotting
+plt.figure()
+plt.errorbar(exposure, meanlist, yerr=stdlist, fmt='ob', linewidth=1, markersize=6, markerfacecolor='b', ecolor='r', capsize=5)
+plt.title('Pixel Intensity vs. Exposure Time for Brightness = 0.7')
+plt.xlabel('Exposure Time [s]')
+plt.ylabel('Pixel Intensity')
+plt.xscale('log')  # Set x-axis to log scale
+
+# Polynomial fit
+coeffs = np.polyfit(exposure, meanlist, 10)
+y_fit = np.polyval(coeffs, exposure)
+plt.plot(exposure, y_fit, 'b', linewidth=2)
+
+plt.savefig('images/exposure.png')
+plt.close()
+```
+::: {#fig-test-data}
+![](./images/exposure.png)
+
+The pixel intensity versus exposure time.
+:::
 
 ### Changing Brightness Level
 
-In both of the plots shown in Fig. #, there is a positive trend between brightness level and pixel intensity. When the exposure time was set to 0.01 seconds (Fig. # a), the pixel intensity increases linearly and then flattens out around 600 arbitrary units. This number matches with the intensity when exposure time is 0.01 seconds in Fig. # above, suggesting that the exposure time has a significant impact on the resulting plot of brightness level vs pixel intensity. When the exposure time is increased to 0.1 seconds in Fig. # b, the linear portion of the graph seems to shift to higher brightness levels and starts to flatten out around 1000 arbitrary units. This intensity value also agrees with the intensity value of an exposure time of 0.1 seconds in Fig. # above. The trend that this data supports is that the camera will most accurately capture LED brightness when the brightness level is low and the exposure time is quick and when the brightness level is high and the exposure time is slow. There is also a very small error across the different trials, suggesting that the camera is capturing the LED brightness precisely.
+In both of the plots shown in Fig. 5.2, there is a positive trend between brightness level and pixel intensity. When the exposure time was set to 0.01 seconds (Fig. # a), the pixel intensity increases linearly and then flattens out around 1023 arbitrary units. This number matches with the intensity when exposure time is 0.01 seconds in Fig. 5.1 above, suggesting that the exposure time has a significant impact on the resulting plot of brightness level vs pixel intensity. When the exposure time is increased to 0.1 seconds in Fig. # b, the linear portion of the graph seems to shift to higher brightness levels and starts to flatten out around 1000 arbitrary units. This intensity value also agrees with the intensity value of an exposure time of 0.1 seconds in Fig. # above. The trend that this data supports is that the camera will most accurately capture LED brightness when the brightness level is low and the exposure time is quick and when the brightness level is high and the exposure time is slow. There is also a very small error across the different trials, suggesting that the camera is capturing the LED brightness precisely.
+
+#### Read and Plot Brightness Values {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from FITC_analysis.py"
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the data
+data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx")
+data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx")
+data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx")
+data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx")
+data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx")
+
+intensity1 = data1.iloc[:, 2]
+intensity2 = data2.iloc[:, 2]
+intensity3 = data3.iloc[:, 2]
+intensity4 = data4.iloc[:, 2]
+intensity5 = data5.iloc[:, 2]
+
+brightness = [0.2, 0.4, 0.6, 0.8, 1]
+
+# Normalize each data set, every 10 data points is a new concentration
+def normalize(exp):
+    min_exp = np.min(exp)
+    max_exp = np.max(exp)
+    return (exp - min_exp) / (max_exp - min_exp)
+
+bright02 = np.concatenate((intensity1[18:26],intensity2[18:26],intensity3[18:26],intensity4[18:26],intensity5[18:26]))
+bright04 = np.concatenate((intensity1[36:44],intensity2[36:44],intensity3[36:44],intensity4[36:44],intensity5[36:44]))
+bright06 = np.concatenate((intensity1[54:62],intensity2[54:62],intensity3[54:62],intensity4[54:62],intensity5[54:62]))
+bright08 = np.concatenate((intensity1[72:80],intensity2[72:80],intensity3[72:80],intensity4[72:80],intensity5[72:80]))
+bright1 = np.concatenate((intensity1[90:98],intensity2[90:98],intensity3[90:98],intensity4[90:98],intensity5[90:98]))
+
+# Statistical Analysis
+list_bright = [bright02, bright04, bright06, bright08, bright1]
+meanlist = []
+stdlist = []
+
+for data in list_bright:
+    meanlist.append(np.mean(data))
+    stdlist.append(np.std(data))
+
+# Plotting
+plt.figure()
+plt.errorbar(brightness, meanlist, yerr=stdlist, fmt='ob', linewidth=1, markersize=6, markerfacecolor='b', ecolor='r', capsize=5)
+plt.title('Pixel Intensity vs. Brightness Level for ExpTime = 0.01')
+plt.xlabel('Brightness Level')
+plt.ylabel('Pixel Intensity')
+
+# Polynomial fit
+coeffs = np.polyfit(brightness, meanlist, 3)
+
+y_fit = np.polyval(coeffs, brightness)
+plt.plot(brightness, y_fit, 'b', linewidth=2)
+
+"""
+plt.figure()
+plt.plot([0.2]*10, bright02, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
+plt.plot([0.4]*10, bright04, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
+plt.plot([0.6]*10, bright06, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
+plt.plot([0.8]*10, bright08, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
+plt.plot([1]*10, bright1, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
+
+
+plt.title('Pixel Intensity vs. Brightness Level for ExpTime = 0.0083')
+plt.xlabel('Brightness Level')
+plt.ylabel('Pixel Intensity')
+"""
+
+plt.savefig('images/brightness.png')
+plt.close()
+```
+::: {#fig-test-data}
+![](./images/brightness.png)
+
+The pixel intensity versus brightness level.
+:::
 
 ### Measuring From a Photodiode
 
-Both plots in Fig. # depict a positive, non-linear relationship between brightness and wattage from the photodiode. Fig. # a shows increasing brightness level from the NeoPixel controls while Figure # b shows increasing tuple value, or color code value. The plots are extremely similar in both shape and in error. The error across the different trials are a lot larger than in Fig.s # and #. This is because the photodiode is measuring the actual LED output rather than what the camera is capturing the brightness to be. The LEDs being used are off the shelf and relatively cheap, so it was expected that they would be less precise than more expensive LED options.
+Both Fig. 5.3 and 5.4 depict a positive, non-linear relationship between brightness and wattage from the photodiode. Fig. 5.3 a shows increasing brightness level from the NeoPixel controls while Figure 5.4 shows increasing tuple value, or color code value. The plots are extremely similar in both shape and in error. The error across the different trials are a lot larger than in Figuress 5.1 and 5.2. This is because the photodiode is measuring the actual LED output rather than what the camera is capturing the brightness to be. The LEDs being used are off the shelf and relatively cheap, so it was expected that they would be less precise than more expensive LED options.
+
+#### Read and Plot Photodiode Values {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from FITC_analysis.py"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Data
+level = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+meanLevel = [194.9, 373.5, 552, 687, 820, 964.3333333, 1063.333333, 1152, 1222, 1287.333333]
+stdLevel = [20.22374842, 37.05738793, 56.15158057, 57.10516614, 67.44627492, 97.42860634, 105.6519443, 102.8931485, 101.7693471, 93.60199428]
+
+tuple_vals = [25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
+meanTuple = [194.7, 384, 552, 710, 843, 961.3333333, 1061, 1148.333333, 1221, 1287.333333]
+stdTuple = [19.43167517, 38.19685851, 53.3291665, 67.29041537, 76.92203845, 83.912653, 89.59910714, 92.1430048, 93.25770746, 93.60199428]
+
+# Plot for tuple values
+plt.figure()
+plt.errorbar(tuple_vals, meanTuple, yerr=stdTuple, fmt='ob', linewidth=2, markersize=6, markerfacecolor='b', label='Mean Tuple')
+
+# Polynomial fit for tuple values
+a1 = np.polyfit(tuple_vals, meanTuple, 1)
+y1 = np.polyval(a1, tuple_vals)
+plt.plot(tuple_vals, y1, 'b', linewidth=2)
+pStr1 = f'y = {a1[0]:.2f}x + {a1[1]:.2f}'
+print(pStr1)
+
+plt.title('LED Output vs. Tuple Value for Brightness Level = 1')
+plt.xlabel('Tuple Value [a.u.]')
+plt.ylabel('LED Output [nW]')
+plt.xlim([0, 260])
+plt.ylim([0, 1400])
+xPos = max(tuple_vals) - 100
+yPos = min(meanTuple)
+plt.text(xPos, yPos, pStr1, fontsize=12, color='b')
+plt.legend()
+plt.savefig('images/photodiodeTuple.png')
+plt.close()
+
+# Plot for brightness levels
+plt.figure()
+plt.errorbar(level, meanLevel, yerr=stdLevel, fmt='+r', linewidth=2, markersize=6, markerfacecolor='r', label='Mean Level')
+
+# Polynomial fit for brightness levels
+a2 = np.polyfit(level, meanLevel, 1)
+y2 = np.polyval(a2, level)
+plt.plot(level, y2, 'r', linewidth=2)
+pStr2 = f'y = {a2[0]:.2f}x + {a2[1]:.2f}'
+print(pStr2)
+
+plt.title('LED Output vs. Brightness Level for Brightness Tuple = (0,0,0,255)')
+plt.xlabel('Brightness Level [a.u.]')
+plt.ylabel('LED Output [nW]')
+plt.xlim([0, 1.1])
+plt.ylim([0, 1400])
+xPos = max(level) - 0.4
+yPos = min(meanLevel)
+plt.text(xPos, yPos, pStr2, fontsize=12, color='r')
+plt.legend()
+
+plt.savefig('images/photodiodeLevel.png')
+plt.close()
+
+```
+::: {#fig-test-data}
+![](./images/photodiodeTuple.png)
+
+The photodiode pixel intensity versus color code for a brightness level of 1.
+:::
+
+::: {#fig-test-data}
+![](./images/photodiodeLevel.png)
+
+The photodiode pixel intensity versus brightness level for a color code of (0,0,0,255)
+:::
 
 ## Flourescence Imaging  {#fluorescence-imaging}
 
 Fig. # shows the normalized pixel intensities of all ten concentrations of FITC for eight different exposure times. As exposure time and concentration increases, the pixel intensity also increases. The 100 milliseconds, or 0.1 seconds, exposure time best represents the expected relationship between concentration and pixel intensity (green curve). As seen in Fig. #, the lower concentrations of FITC are a lot less fluorescent than the higher concentrations. The green curve shows a large increase in pixel intensity in the higher concentrations, with it flattening out at the maximum value of 1 in the normalized plot. This maximum value of 1 corresponds to 1023 arbitrary units. The slower exposure times (purple and blue curves) also show the trend to an extent. These larger exposure times mean that the images captured by the camera are super bright, so most of the concentrations have large intensity values. The faster exposure times have the opposite effect. The images captured by the camera are super dark, and the pixel intensity values are low. The intensity values for each concentration represent how fluorescent each concentration is. Based on this data, the higher concentrations of FITC are more fluorescent than the lower concentrations.
+
+#### Read FITC Data and Extract Values {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from FITC_analysis.py"
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the data from the Excel files
+data1 = pd.read_excel("Data/FITC/pixel_circle1.xlsx")
+data2 = pd.read_excel("Data/FITC/pixel_circle2.xlsx")
+data3 = pd.read_excel("Data/FITC/pixel_circle3.xlsx")
+data4 = pd.read_excel("Data/FITC/pixel_circle4.xlsx")
+data5 = pd.read_excel("Data/FITC/pixel_circle5.xlsx")
+
+data1m = data1.iloc[:, 2].values
+data2m = data2.iloc[:, 2].values
+data3m = data3.iloc[:, 2].values
+data4m = data4.iloc[:, 2].values
+data5m = data5.iloc[:, 2].values
+
+data1s = data1.iloc[:, 3].values
+data2s = data2.iloc[:, 3].values
+data3s = data3.iloc[:, 3].values
+data4s = data4.iloc[:, 3].values
+data5s = data5.iloc[:, 3].values
+
+# Extract the subsets For FITC
+m_con_00001 = np.array([data1m[:10], data2m[:10], data3m[:10], data4m[:10], data5m[:10]])
+m_con_00005 = np.array([data1m[10:21], data2m[10:21], data3m[10:21], data4m[10:21], data5m[10:21]])
+m_con_00010 = np.array([data1m[21:32], data2m[21:32], data3m[21:32], data4m[21:32], data5m[21:32]])
+m_con_00050 = np.array([data1m[32:43], data2m[32:43], data3m[32:43], data4m[32:43], data5m[32:43]])
+m_con_00100 = np.array([data1m[43:54], data2m[43:54], data3m[43:54], data4m[43:54], data5m[43:54]])
+m_con_00500 = np.array([data1m[54:65], data2m[54:65], data3m[54:65], data4m[54:65], data5m[54:65]])
+m_con_01000 = np.array([data1m[65:76], data2m[65:76], data3m[65:76], data4m[65:76], data5m[65:76]])
+m_con_10000 = np.array([data1m[76:87], data2m[76:87], data3m[76:87], data4m[76:87], data5m[76:87]])
+m_con_05000 = np.array([data1m[87:98], data2m[87:98], data3m[87:98], data4m[87:98], data5m[87:98]])
+
+m_con_00001 = m_con_00001.astype(float)
+m_con_00005 = m_con_00005.astype(float)
+m_con_00010 = m_con_00010.astype(float)
+m_con_00050 = m_con_00050.astype(float)
+m_con_00100 = m_con_00100.astype(float)
+m_con_00500 = m_con_00500.astype(float)
+m_con_01000 = m_con_01000.astype(float)
+m_con_10000 = m_con_10000.astype(float)
+m_con_05000 = m_con_05000.astype(float)
+
+# Calculate standard deviations
+std_con_00001 = np.std(m_con_00001, axis=0)
+std_con_00005 = np.std(m_con_00005, axis=0)
+std_con_00010 = np.std(m_con_00010, axis=0)
+std_con_00050 = np.std(m_con_00050, axis=0)
+std_con_00100 = np.std(m_con_00100, axis=0)
+std_con_00500 = np.std(m_con_00500, axis=0)
+std_con_01000 = np.std(m_con_01000, axis=0)
+std_con_05000 = np.std(m_con_05000, axis=0)
+std_con_10000 = np.std(m_con_10000, axis=0)
+
+# Calculate means
+m_con_00001 = np.mean(m_con_00001, axis=0)
+m_con_00005 = np.mean(m_con_00005, axis=0)
+m_con_00010 = np.mean(m_con_00010, axis=0)
+m_con_00050 = np.mean(m_con_00050, axis=0)
+m_con_00100 = np.mean(m_con_00100, axis=0)
+m_con_00500 = np.mean(m_con_00500, axis=0)
+m_con_01000 = np.mean(m_con_01000, axis=0)
+m_con_05000 = np.mean(m_con_05000, axis=0)
+m_con_10000 = np.mean(m_con_10000, axis=0)
+
+# Normalize data
+std_con_00001 /= 1023
+std_con_00005 /= 1023
+std_con_00010 /= 1023
+std_con_00050 /= 1023
+std_con_00100 /= 1023
+std_con_00500 /= 1023
+std_con_01000 /= 1023
+
+m_con_00001 /= 1023
+m_con_00005 /= 1023
+m_con_00010 /= 1023
+m_con_00050 /= 1023
+m_con_00100 /= 1023
+m_con_00500 /= 1023
+m_con_01000 /= 1023
+
+```
+#### Plot FITC Data {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from FITC_analysis.py"
+# Plotting
+concentration = [10**-3, 10**-4, 10**-5, 10**-6, 10**-7, 10**-8, 10**-9, 10**-10, 10**-11, 10**-12, 10**-14]
+conc = [-3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+
+plt.plot(conc, m_con_00001[:10], '-o', color='blue', linewidth=1, markersize=6, markerfacecolor='blue', label='1ms')
+plt.plot(conc, m_con_00005[:10], '-o', color='magenta', linewidth=1, markersize=6, markerfacecolor='magenta', label='5ms')
+plt.plot(conc, m_con_00010[:10], '-o', color='#FFA500', linewidth=1, markersize=6, markerfacecolor='#FFA500', label='10ms')
+plt.plot(conc, m_con_00050[:10], '-o', color='red', linewidth=1, markersize=6, markerfacecolor='red', label='50ms')
+plt.plot(conc, m_con_00100[:10], '-o', color='green', linewidth=1, markersize=6, markerfacecolor='green', label='100ms')
+plt.plot(conc, m_con_00500[:10], '-o', color='cyan', linewidth=1, markersize=6, markerfacecolor='cyan', label='500ms')
+plt.plot(conc, m_con_01000[:10], '-o', color='#7E2F8E', linewidth=1, markersize=6, markerfacecolor='#7E2F8E', label='1000ms')
+
+plt.errorbar(conc, m_con_00001[:10], yerr=std_con_00001[:10], fmt='o', color='blue', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_00005[:10], yerr=std_con_00005[:10], fmt='o', color='magenta', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_00010[:10], yerr=std_con_00010[:10], fmt='o', color='#FFA500', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_00050[:10], yerr=std_con_00050[:10], fmt='o', color='red', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_00100[:10], yerr=std_con_00100[:10], fmt='o', color='green', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_00500[:10], yerr=std_con_00500[:10], fmt='o', color='cyan', linewidth=2, markerfacecolor='none')
+plt.errorbar(conc, m_con_01000[:10], yerr=std_con_01000[:10], fmt='o', color='#7E2F8E', linewidth=2, markerfacecolor='none')
+
+plt.title('Pixel Intensity vs. Concentration')
+plt.xlabel('Log[FITC Concentration M]')
+plt.ylabel('Pixel Intensity')
+plt.legend(loc='upper right')
+plt.savefig('images/FITC.png')
+plt.close()
+```
+::: {#fig-test-data}
+![](./images/FITC.png)
+
+The pixel intensity versus FITC concentration for varying exposure times.
+:::
 
 ## Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
 
@@ -64,7 +429,7 @@ N = 255  # Size of the speckle pattern
 a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
 ```
 
-#### Create a filter and Apply it to the Speckle Image
+#### Create a filter and Apply it to the Speckle Image {.unnumbered}
 
 ```{python}
 #| code-fold: true
@@ -243,6 +608,177 @@ As the cutoff frequency decreases, the size of the speckle in pixels increases. 
 The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of XX ml/hr, XX ml/hr, XX ml/hr, and XX ml/hr. The resulting speckle images, LSCI reproductions and intensity histograms are shown in Figures #, #, #, and #. 
 
 MORE ONCE WE HAVE CONCLUSIVE RESULTS…
+
+#### Finding the moving LSCI K value {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckle_an.py"
+
+
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import cv2
+from scipy.ndimage import gaussian_filter
+import os
+import pandas as pd
+
+# Load BMP image and convert to grayscale numpy array
+def load_and_normalize_image(image_path):
+    img = Image.open(image_path).convert('L')
+    img_array = np.array(img)
+    # Normalize the image to range [0, 1]
+    img_normalized = img_array / 255.0
+    return img_normalized
+
+# Function for Fourier Transform
+def ft2(im):
+    return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(im)))
+
+# Function for Inverse Fourier Transform
+def ift2(im):
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
+
+# Calculate speckle contrast
+def calcSpeckleContrast1(photo):
+    
+    window = photo[:][:]
+    w_dev = np.std(window)
+    w_meanInt = np.mean(window)
+    w_speckle_contrast = w_dev / w_meanInt 
+    
+    # the selection of SQUARE x SQUARE pixels where speckle will be calculated
+    SQUARE = 7
+    
+    # convert photo into an np array
+    pArr = np.asarray(photo)
+    
+    # the speckle contrast array that will be returned
+    contrast_array = [ [0]*(len(pArr[0])-SQUARE) for i in range((len(pArr))-SQUARE) ]
+    conMin = np.inf;
+    
+    # The Loop Does the Following:
+    # goes through 7x7 selections of the image
+    # computes the speckle contrast for this region
+    # using this comparison, create a new matrix with values whose magnitude
+        # decreases depending on how "blurry" the selection is
+    for r in range(len(pArr) - SQUARE):
+        for c in range(len(pArr[0]) - SQUARE):
+            x1 = r; x2 = r+SQUARE-1
+            y1 = c; y2 = c+SQUARE-1
+            selection = pArr[x1:x2, y1:y2]
+            
+            s_dev = np.std(selection)
+            s_meanInt = np.mean(selection)
+            
+            # to cut out values outside of the speckle caught on camera
+            #if (s_meanInt <= 0.1 and s_dev <= 0.1):
+              # contrast_array[r][c] = np.NaN
+            #else:
+            s_speckle_contrast = s_dev / s_meanInt
+                
+            if s_speckle_contrast < conMin and s_speckle_contrast != 0:
+                conMin = s_speckle_contrast
+                    
+            contrast_array[r][c] = s_speckle_contrast
+    
+    conArr = np.asarray(contrast_array)
+    conArr[conArr == 0] = conMin
+    
+    return (w_speckle_contrast, contrast_array)
+
+def calcSpeckleContrast(image_path):
+    x1 = 2150; x2 = 2600
+    y1 = 1200; y2 = 1600  
+
+    image = plt.imread(image_path)
+    intensity = np.asarray(image[y1:y2, x1:x2])
+   
+    stat_x1 = 0; stat_x2 = 50
+    stat_y1 = 0; stat_y2= 50
+
+    mov_x1 = 0; mov_x2 = 50
+    mov_y1 = 200; mov_y2 = 250      
+
+    filtered = gaussian_filter(intensity, 2)
+
+    static_window = np.asarray(filtered[stat_y1:stat_y2,stat_x1:stat_x2])
+    stat_con = np.std(static_window) / np.mean(static_window)
+    moving_window = np.asarray(filtered[mov_y1:mov_y2,mov_x1:mov_x2])
+    move_con = np.std(moving_window) / np.mean(moving_window)
+
+    return (move_con, stat_con)
+
+def process_images(folder_path):
+    results = {}
+
+    # Iterate through the folder and process images
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.bmp'):
+            # Extract flowrate and exposure time from the filename
+            parts = filename.split('_')
+            flowrate = parts[1]  # Assuming flowrate is the first part
+            exposure_time = parts[2]  # Assuming exposure time is the second part
+
+            # Initialize the flowrate in results dictionary if not already
+            if flowrate not in results:
+                results[flowrate] = {}
+
+            # Initialize the exposure time in the flowrate dictionary if not already
+            if exposure_time not in results[flowrate]:
+                results[flowrate][exposure_time] = []
+
+            # Get the LSCI from the image
+            move_con, stat_con = calcSpeckleContrast(os.path.join(folder_path, filename))
+            
+            results[flowrate][exposure_time].append(move_con)
+
+    # Calculate the average for each exposure time within each flowrate
+    averages = {}
+    stds = {}
+    for flowrate, exposure_times in results.items():
+        averages[flowrate] = {}
+        for exposure_time, values in exposure_times.items():
+            averages[flowrate][exposure_time] = np.mean(values)
+    
+    # Convert results to DataFrame for saving
+    df = pd.DataFrame.from_dict({(flowrate, exposure_time): avg 
+                                  for flowrate, exposure_times in averages.items() 
+                                  for exposure_time, avg in exposure_times.items()},
+                                 orient='index', columns=['Average Value']).reset_index()
+
+    # Split the MultiIndex into separate columns
+    df[['Flowrate', 'Exposure Time']] = pd.DataFrame(df['index'].tolist(), index=df.index)
+
+    # Drop the original index column
+    df.drop('index', axis=1, inplace=True)
+
+    # Rearrange columns
+    df = df[['Flowrate', 'Exposure Time', 'Average Value']]
+    df.to_csv(folder_path + '/averages.csv', index=False)
+
+
+# RUN CODE
+
+folder_path = 'Data/0.001s'
+process_images(folder_path)
+
+#| label: tbl-planets
+#| tbl-cap: Average K value for 0.001s Exposure Time
+
+from IPython.display import Markdown
+from tabulate import tabulate
+
+# Display the csv as a Markdown table
+
+table = pd.read_csv('Data/0.001s/averages.csv')
+Markdown(tabulate(
+  table, 
+  headers=["Flowrate","Exposure Time", "Average K"]
+))
+
+```
 
 ## Additional Capabilities
 
