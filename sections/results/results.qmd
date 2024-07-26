@@ -25,67 +25,50 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
-# Load the data
-data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx")
-data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx")
-data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx")
-data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx")
-data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx")
+data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx", sheet_name="Sheet2")
+data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx", sheet_name="Sheet2")
+data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx", sheet_name="Sheet2")
+data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx", sheet_name="Sheet2")
+data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx", sheet_name="Sheet2")
 
-intensity1 = data1.iloc[:, 2]
-intensity2 = data2.iloc[:, 2]
-intensity3 = data3.iloc[:, 2]
-intensity4 = data4.iloc[:, 2]
-intensity5 = data5.iloc[:, 2]
+# For Exposure Times
+data1_subsets = [data1.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
+data2_subsets = [data2.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
+data3_subsets = [data3.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
+data4_subsets = [data4.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
+data5_subsets = [data5.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
 
-exposure = [10, 5, 1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001]
+# Calculate means and std for each subset
+m_data1 = np.array([np.mean(subset) for subset in data1_subsets])
+m_data2 = np.array([np.mean(subset) for subset in data2_subsets])
+m_data3 = np.array([np.mean(subset) for subset in data3_subsets])
+m_data4 = np.array([np.mean(subset) for subset in data4_subsets])
+m_data5 = np.array([np.mean(subset) for subset in data5_subsets])
 
-# Normalize each data set, every 10 data points is a new concentration
-def normalize(exp):
-    min_exp = np.min(exp)
-    max_exp = np.max(exp)
-    return (exp - min_exp) / (max_exp - min_exp)
+s_data1 = np.array([np.std(subset) for subset in data1_subsets])
+s_data2 = np.array([np.std(subset) for subset in data2_subsets])
+s_data3 = np.array([np.std(subset) for subset in data3_subsets])
+s_data4 = np.array([np.std(subset) for subset in data4_subsets])
+s_data5 = np.array([np.std(subset) for subset in data5_subsets])
+# 
+# Combine means and std of each numbered data
+means = np.mean([m_data1, m_data2, m_data3, m_data4, m_data5], axis=0)
 
-#exp1 = intensity[:9]  # only 9 values instead of 10 because shifting is wrong and won't work correctly
-exp10 = np.concatenate((intensity1[63:71], intensity2[63:71],intensity3[63:71],intensity4[63:71],intensity5[63:71]))
-exp5 = np.concatenate((intensity1[72:80], intensity2[72:80],intensity3[72:80],intensity4[72:80], intensity5[72:80]))
-exp1 = np.concatenate((intensity1[54:62],intensity2[54:62],intensity3[53:62],intensity4[54:62],intensity5[54:62]))
-exp05 = np.concatenate((intensity1[45:53],intensity2[45:53],intensity3[45:53],intensity4[45:53],intensity5[45:53]))
-exp01 = np.concatenate((intensity1[36:44],intensity2[36:44],intensity3[36:44],intensity4[36:44],intensity5[36:44]))
-exp005 = np.concatenate((intensity1[27:35],intensity2[27:35],intensity3[27:35],intensity4[27:35],intensity5[27:35]))
-exp001 = np.concatenate((intensity1[18:26],intensity2[18:26],intensity3[18:26],intensity4[18:26],intensity5[18:26]))
-exp0005 = np.concatenate((intensity1[9:17],intensity2[9:17],intensity3[9:17],intensity4[9:17],intensity5[9:17]))
-exp0001 = np.concatenate((intensity1[0:8],intensity2[0:8],intensity3[0:8],intensity4[0:8],intensity5[0:9]))
+stds = np.std([s_data1, s_data2, s_data3, s_data4, s_data5], axis=0)
 
-# Statistical Analysis
-list_exp = [exp10, exp5, exp1, exp05, exp01, exp005, exp001, exp0005, exp0001]
+exp = [0.001, 0.005, 0.01, 0.05, 0.1]
 
-meanlist = []
-stdlist = []
-
-#for i in range(0, 8, 1):
-    #lower = 1
-    #upper = 10
-    #data = list_exp[i][lower:upper]
-    #meanlist.append(np.mean(data))
-    #stdlist.append(int(np.std(data)))
-
-for data in list_exp:
-    meanlist.append(np.mean(data))
-    stdlist.append(np.std(data))
-
-# Plotting
 plt.figure()
-plt.errorbar(exposure, meanlist, yerr=stdlist, fmt='ob', linewidth=1, markersize=6, markerfacecolor='b', ecolor='r', capsize=5)
-plt.title('Pixel Intensity vs. Exposure Time for Brightness = 0.7')
+plt.errorbar(exp, means, yerr=stds, fmt='o', color='red', linewidth=2, markersize=6, label='Mean')
+plt.title('Brightness Level = 0.7')
+plt.suptitle('Pixel Intensity vs. Exposure Time')
+plt.ylim([0, 1100])
 plt.xlabel('Exposure Time [s]')
-plt.ylabel('Pixel Intensity')
-plt.xscale('log')  # Set x-axis to log scale
-
-# Polynomial fit
-coeffs = np.polyfit(exposure, meanlist, 10)
-y_fit = np.polyval(coeffs, exposure)
-plt.plot(exposure, y_fit, 'b', linewidth=2)
+plt.ylabel('Pixel Intensity [a.u.]')
+# Polynomial Fit
+coeffs = np.polyfit(exp, means, 10)
+y_fit = np.polyval(coeffs, exp)
+plt.plot(exp, y_fit, 'r', linewidth=2)
 
 plt.savefig('images/exposure.png')
 plt.close()
@@ -104,73 +87,56 @@ In both of the plots shown in Fig. 5.2, there is a positive trend between bright
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from FITC_analysis.py"
-
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load the data
-data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx")
-data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx")
-data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx")
-data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx")
-data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx")
+# Read the data from Sheet 2
+data1 = pd.read_excel("Data/brightness/lastBrightness1.xlsx", sheet_name="Sheet2")
+data2 = pd.read_excel("Data/brightness/lastBrightness2.xlsx", sheet_name="Sheet2")
+data3 = pd.read_excel("Data/brightness/lastBrightness3.xlsx", sheet_name="Sheet2")
+data4 = pd.read_excel("Data/brightness/lastBrightness4.xlsx", sheet_name="Sheet2")
+data5 = pd.read_excel("Data/brightness/lastBrightness5.xlsx", sheet_name="Sheet2")
 
-intensity1 = data1.iloc[:, 2]
-intensity2 = data2.iloc[:, 2]
-intensity3 = data3.iloc[:, 2]
-intensity4 = data4.iloc[:, 2]
-intensity5 = data5.iloc[:, 2]
+# For Brightness Levels
+data1_subsets = [data1.iloc[i:i+9].values.flatten() for i in range(0, 99, 9)]
+data2_subsets = [data2.iloc[i:i+9].values.flatten() for i in range(0, 99, 9)]
+data3_subsets = [data3.iloc[i:i+9].values.flatten() for i in range(0, 99, 9)]
+data4_subsets = [data4.iloc[i:i+9].values.flatten() for i in range(0, 99, 9)]
+data5_subsets = [data5.iloc[i:i+9].values.flatten() for i in range(0, 99, 9)]
 
-brightness = [0.2, 0.4, 0.6, 0.8, 1]
+# Calculate means and std for each subset
+m_data1 = np.array([np.mean(subset) for subset in data1_subsets])
+m_data2 = np.array([np.mean(subset) for subset in data2_subsets])
+m_data3 = np.array([np.mean(subset) for subset in data3_subsets])
+m_data4 = np.array([np.mean(subset) for subset in data4_subsets])
+m_data5 = np.array([np.mean(subset) for subset in data5_subsets])
 
-# Normalize each data set, every 10 data points is a new concentration
-def normalize(exp):
-    min_exp = np.min(exp)
-    max_exp = np.max(exp)
-    return (exp - min_exp) / (max_exp - min_exp)
+s_data1 = np.array([np.std(subset) for subset in data1_subsets])
+s_data2 = np.array([np.std(subset) for subset in data2_subsets])
+s_data3 = np.array([np.std(subset) for subset in data3_subsets])
+s_data4 = np.array([np.std(subset) for subset in data4_subsets])
+s_data5 = np.array([np.std(subset) for subset in data5_subsets])
 
-bright02 = np.concatenate((intensity1[18:26],intensity2[18:26],intensity3[18:26],intensity4[18:26],intensity5[18:26]))
-bright04 = np.concatenate((intensity1[36:44],intensity2[36:44],intensity3[36:44],intensity4[36:44],intensity5[36:44]))
-bright06 = np.concatenate((intensity1[54:62],intensity2[54:62],intensity3[54:62],intensity4[54:62],intensity5[54:62]))
-bright08 = np.concatenate((intensity1[72:80],intensity2[72:80],intensity3[72:80],intensity4[72:80],intensity5[72:80]))
-bright1 = np.concatenate((intensity1[90:98],intensity2[90:98],intensity3[90:98],intensity4[90:98],intensity5[90:98]))
+# Combine means and std of each numbered data
+means = np.mean([m_data1, m_data2, m_data3, m_data4, m_data5], axis=0)
 
-# Statistical Analysis
-list_bright = [bright02, bright04, bright06, bright08, bright1]
-meanlist = []
-stdlist = []
+stds = np.std([s_data1, s_data2, s_data3, s_data4, s_data5], axis=0)
 
-for data in list_bright:
-    meanlist.append(np.mean(data))
-    stdlist.append(np.std(data))
+bri = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 
 # Plotting
 plt.figure()
-plt.errorbar(brightness, meanlist, yerr=stdlist, fmt='ob', linewidth=1, markersize=6, markerfacecolor='b', ecolor='r', capsize=5)
-plt.title('Pixel Intensity vs. Brightness Level for ExpTime = 0.01')
-plt.xlabel('Brightness Level')
-plt.ylabel('Pixel Intensity')
-
-# Polynomial fit
-coeffs = np.polyfit(brightness, meanlist, 3)
-
-y_fit = np.polyval(coeffs, brightness)
-plt.plot(brightness, y_fit, 'b', linewidth=2)
-
-"""
-plt.figure()
-plt.plot([0.2]*10, bright02, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
-plt.plot([0.4]*10, bright04, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
-plt.plot([0.6]*10, bright06, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
-plt.plot([0.8]*10, bright08, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
-plt.plot([1]*10, bright1, 'ob', linewidth=1, markersize=6, markerfacecolor='b')
-
-
-plt.title('Pixel Intensity vs. Brightness Level for ExpTime = 0.0083')
-plt.xlabel('Brightness Level')
-plt.ylabel('Pixel Intensity')
-"""
+plt.errorbar(bri, means, yerr=stds, fmt='o', color='blue', linewidth=2, markersize=6, label='Mean')
+plt.title('Exposure Time = 0.1 s')
+plt.suptitle('Pixel Intensity vs. Brightness Level')
+plt.ylim([0, 1100])
+plt.xlabel('Brightness Level [a.u.]')
+plt.ylabel('Pixel Intensity [a.u.]')
+# Polynomial Fit
+coeffs = np.polyfit(bri, means, 10)
+y_fit = np.polyval(coeffs, bri)
+plt.plot(bri, y_fit, 'b', linewidth=2)
 
 plt.savefig('images/brightness.png')
 plt.close()
