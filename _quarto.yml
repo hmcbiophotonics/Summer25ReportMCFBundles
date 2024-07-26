@@ -18,6 +18,8 @@ book:
     - sections/results/results.qmd
     - sections/conclusion/conclusion.qmd
     - sections/acknowledgements/acknowledgements.qmd
+    - sections/appendix/appendix.qmd
+
 
 format:
   html:
