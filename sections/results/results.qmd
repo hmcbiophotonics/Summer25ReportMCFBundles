@@ -66,7 +66,7 @@ plt.ylim([0, 1100])
 plt.xlabel('Exposure Time [s]')
 plt.ylabel('Pixel Intensity [a.u.]')
 # Polynomial Fit
-coeffs = np.polyfit(exp, means, 10)
+coeffs = np.polyfit(exp, means, 4)
 y_fit = np.polyval(coeffs, exp)
 plt.plot(exp, y_fit, 'r', linewidth=2)
 
@@ -134,7 +134,7 @@ plt.ylim([0, 1100])
 plt.xlabel('Brightness Level [a.u.]')
 plt.ylabel('Pixel Intensity [a.u.]')
 # Polynomial Fit
-coeffs = np.polyfit(bri, means, 10)
+coeffs = np.polyfit(bri, means, 4)
 y_fit = np.polyval(coeffs, bri)
 plt.plot(bri, y_fit, 'b', linewidth=2)
 
@@ -179,13 +179,13 @@ bri = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # Plotting
 plt.figure()
 plt.errorbar(bri, means, yerr=stds, fmt='o', color='blue', linewidth=2, markersize=6, label='Mean')
-plt.title('Exposure Time = 0.1 s')
+plt.title('Exposure Time = 0.01 s')
 plt.suptitle('Pixel Intensity vs. Brightness Level')
 plt.ylim([0, 1100])
 plt.xlabel('Brightness Level [a.u.]')
 plt.ylabel('Pixel Intensity [a.u.]')
 # Polynomial Fit
-coeffs = np.polyfit(bri, means, 10)
+coeffs = np.polyfit(bri, means, 4)
 y_fit = np.polyval(coeffs, bri)
 plt.plot(bri, y_fit, 'b', linewidth=2)
 
@@ -210,33 +210,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Data
-level = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-meanLevel = [194.9, 373.5, 552, 687, 820, 964.3333333, 1063.333333, 1152, 1222, 1287.333333]
-stdLevel = [20.22374842, 37.05738793, 56.15158057, 57.10516614, 67.44627492, 97.42860634, 105.6519443, 102.8931485, 101.7693471, 93.60199428]
+level = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+meanLevel = [0.566, 194.9, 373.5, 552, 687, 820, 964.3333333, 1063.333333, 1152, 1222, 1287.333333]
+stdLevel = [0.305, 20.22374842, 37.05738793, 56.15158057, 57.10516614, 67.44627492, 97.42860634, 105.6519443, 102.8931485, 101.7693471, 93.60199428]
 
-tuple_vals = [25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
-meanTuple = [194.7, 384, 552, 710, 843, 961.3333333, 1061, 1148.333333, 1221, 1287.333333]
-stdTuple = [19.43167517, 38.19685851, 53.3291665, 67.29041537, 76.92203845, 83.912653, 89.59910714, 92.1430048, 93.25770746, 93.60199428]
+tuple_vals = [0, 25, 51, 76, 102, 127, 153, 178, 204, 229, 255]
+meanTuple = [0.566, 194.7, 384, 552, 710, 843, 961.3333333, 1061, 1148.333333, 1221, 1287.333333]
+stdTuple = [0.305, 19.43167517, 38.19685851, 53.3291665, 67.29041537, 76.92203845, 83.912653, 89.59910714, 92.1430048, 93.25770746, 93.60199428]
 
 # Plot for tuple values
 plt.figure()
 plt.errorbar(tuple_vals, meanTuple, yerr=stdTuple, fmt='ob', linewidth=2, markersize=6, markerfacecolor='b', label='Mean Tuple')
 
 # Polynomial fit for tuple values
-a1 = np.polyfit(tuple_vals, meanTuple, 1)
+a1 = np.polyfit(tuple_vals, meanTuple, 2)
 y1 = np.polyval(a1, tuple_vals)
 plt.plot(tuple_vals, y1, 'b', linewidth=2)
-pStr1 = f'y = {a1[0]:.2f}x + {a1[1]:.2f}'
-print(pStr1)
+pStr1 = 'y = {:.2f}x^2 + {:.2f}x + {:.2f}'.format(a1[0], a1[1], a1[2])
+# Calculate the residuals
+residuals1 = meanTuple - y1
+
+# Calculate the total sum of squares (SStot)
+SStot1 = np.sum((meanTuple - np.mean(meanTuple))**2)
+
+# Calculate the sum of squares of residuals (SSres)
+SSres1 = np.sum(residuals1**2)
+
+# Calculate R-squared
+R21 = 1 - (SSres1 / SStot1)
+
+# Display the results
+pStr1R = f'R² = {R21:.4f}'
 
 plt.title('LED Output vs. Tuple Value for Brightness Level = 1')
 plt.xlabel('Tuple Value [a.u.]')
 plt.ylabel('LED Output [nW]')
 plt.xlim([0, 260])
 plt.ylim([0, 1400])
-xPos = max(tuple_vals) - 100
-yPos = min(meanTuple)
+xPos = max(tuple_vals) - 150
+yPos = min(meanTuple) + 200
 plt.text(xPos, yPos, pStr1, fontsize=12, color='b')
+plt.text(xPos, yPos-100, pStr1, fontsize=12, color='b')
+
 plt.legend()
 plt.savefig('images/photodiodeTuple.png')
 plt.close()
@@ -246,20 +261,30 @@ plt.figure()
 plt.errorbar(level, meanLevel, yerr=stdLevel, fmt='+r', linewidth=2, markersize=6, markerfacecolor='r', label='Mean Level')
 
 # Polynomial fit for brightness levels
-a2 = np.polyfit(level, meanLevel, 1)
+a2 = np.polyfit(level, meanLevel, 2)
 y2 = np.polyval(a2, level)
 plt.plot(level, y2, 'r', linewidth=2)
-pStr2 = f'y = {a2[0]:.2f}x + {a2[1]:.2f}'
-print(pStr2)
+pStr2 = 'y = {:.2f}x^2 + {:.2f}x + {:.2f}'.format(a2[0], a2[1], a2[2])
+# Calculate the residuals
+residuals2 = meanLevel - y2
+# Calculate the total sum of squares (SStot)
+SStot2 = np.sum((meanLevel - np.mean(meanLevel))**2)
+# Calculate the sum of squares of residuals (SSres)
+SSres2 = np.sum(residuals2**2)
+# Calculate R-squared
+R22 = 1 - (SSres2 / SStot2)
+# Display the results
+pStr2R = f'R² = {R22:.4f}'
 
 plt.title('LED Output vs. Brightness Level for Brightness Tuple = (0,0,0,255)')
 plt.xlabel('Brightness Level [a.u.]')
 plt.ylabel('LED Output [nW]')
 plt.xlim([0, 1.1])
 plt.ylim([0, 1400])
-xPos = max(level) - 0.4
-yPos = min(meanLevel)
+xPos = max(level) - 0.6
+yPos = min(meanLevel) + 200
 plt.text(xPos, yPos, pStr2, fontsize=12, color='r')
+plt.text(xPos, yPos-100, pStr2, fontsize=12, color='r')
 plt.legend()
 
 plt.savefig('images/photodiodeLevel.png')
@@ -614,9 +639,7 @@ The simulated and filtered speckle images.
 As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N/4 results in a filtered speckle size of 2 pixels, N/8 results in a filtered speckle size of 4 pixels, and N/16 results in a filtered speckle size of 8 pixels, as shown in Figures 5.7, 5.8, and 5.9. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter's cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. 5.7 shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N/4, while Fig. 5.9 shows an amplitude peak at 0.1 for a cutoff frequency of N/16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject's roughness or uniformity.
 
 ### Physical Tests
-The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of XX ml/hr, XX ml/hr, XX ml/hr, and XX ml/hr. The resulting speckle images, LSCI reproductions and intensity histograms are shown in Figures 5.10a, 5.10b, 5.10c, and 5.10d. 
-
-MORE ONCE WE HAVE CONCLUSIVE RESULTS…
+The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of 0 ml/hr, 50 ml/hr, 100 ml/hr, 150 ml/hr, and 200 ml/hr. The resulting speckle images, LSCI reproductions and LSCI K values are shown in Fig. 5.10 and Table 5.1. While there is a general decreasing trend in the K values as flow rate decreases, there are discrepancies from value to value. 
 
 #### Finding the moving LSCI K value {.unnumbered}
 ```{python}
@@ -650,8 +673,14 @@ def ift2(im):
     return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
 
 # Calculate speckle contrast
-def calcSpeckleContrast1(photo):
-    
+def calcSpeckleContrast(image_path):
+    x1 = 2150; x2 = 2600
+    y1 = 1200; y2 = 1600  
+
+    image = plt.imread(image_path)
+    intensity = np.asarray(image[y1:y2, x1:x2])
+    photo = gaussian_filter(intensity, 2)
+
     window = photo[:][:]
     w_dev = np.std(window)
     w_meanInt = np.mean(window)
@@ -697,7 +726,7 @@ def calcSpeckleContrast1(photo):
     
     return (w_speckle_contrast, contrast_array)
 
-def calcSpeckleContrast(image_path):
+def calcSpeckleContrastVal(image_path):
     x1 = 2150; x2 = 2600
     y1 = 1200; y2 = 1600  
 
@@ -739,7 +768,7 @@ def process_images(folder_path):
                 results[flowrate][exposure_time] = []
 
             # Get the LSCI from the image
-            move_con, stat_con = calcSpeckleContrast(os.path.join(folder_path, filename))
+            move_con, stat_con = calcSpeckleContrastVal(os.path.join(folder_path, filename))
             
             results[flowrate][exposure_time].append(move_con)
 
@@ -784,14 +813,107 @@ from tabulate import tabulate
 table = pd.read_csv('Data/0.001s/averages.csv')
 Markdown(tabulate(
   table, 
-  headers=["Flowrate","Exposure Time", "Average K"]
+  headers=["Flowrate [ml/hr]","Exposure Time [s]", "Average K [a.u.]"]
 ))
 
 ```
+#### Finding the LSCI Reproduction of Different Flowrates {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckle_an.py"
+#| output: false
+
+image_path1 = 'Data/0.001s/LSCI_0ml_0.001_1.bmp'
+image_path2 = 'Data/0.001s/LSCI_50ml_0.001_1.bmp'
+image_path3 = 'Data/0.001s/LSCI_100ml_0.001_1.bmp'
+image_path4 = 'Data/0.001s/LSCI_150ml_0.001_1.bmp'
+image_path5 = 'Data/0.001s/LSCI_200ml_0.001_1.bmp'
+
+x1 = 2150; x2 = 2600
+y1 = 1200; y2 = 1600  
+
+
+# Plot the Original Speckle Image
+original = Image.open(image_path4).convert('L')
+og_int = np.asarray(original)
+og_int = og_int[y1:y2, x1:x2]
+
+# Plot the speckle contrast
+
+(cont1, contrast_array1) = calcSpeckleContrast(image_path1)
+(cont2, contrast_array2) = calcSpeckleContrast(image_path2)
+(cont3, contrast_array3) = calcSpeckleContrast(image_path3)
+(cont4, contrast_array4) = calcSpeckleContrast(image_path4)
+(cont5, contrast_array5) = calcSpeckleContrast(image_path5)
+
+fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(12, 4))
+
+im0 = ax[0,0].imshow(og_int, cmap = 'gray', vmin=0, vmax=255)
+ax[0,0].set_title("(a) Intensity of Laser Speckle for 150 ml/hr", fontsize = 8)
+divider0 = make_axes_locatable(ax[0, 0])
+cax0 = divider0.append_axes("right", size="5%", pad=0.05)
+cbar0 = fig.colorbar(im0, cax=cax0)
+cbar0.set_label('Intensity [a.u.]')
+
+im1 = ax[0,1].imshow(contrast_array1, cmap = "jet")
+ax[0,1].set_title(f'(b) Speckle Contrast of Laser Speckle for 0 ml/hr', fontsize = 8)
+divider1 = make_axes_locatable(ax[0, 1])
+cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+cbar1 = fig.colorbar(im1, cax=cax1)
+cbar1.set_label('Speckle Contrast K [a.u.]')
+
+im2 = ax[0,2].imshow(contrast_array2, cmap = "jet")
+ax[0,2].set_title(f'(c) Speckle Contrast of Laser Speckle for 50 ml/hr', fontsize = 8)
+divider2 = make_axes_locatable(ax[0, 2])
+cax2 = divider2.append_axes("right", size="5%", pad=0.05)
+cbar2 = fig.colorbar(im2, cax=cax2)
+cbar2.set_label('Speckle Contrast K [a.u.]')
+
+im3 = ax[1,0].imshow(contrast_array3, cmap = "jet")
+ax[1,0].set_title(f'(c) Speckle Contrast of Laser Speckle for 100 ml/hr', fontsize = 8)
+divider3 = make_axes_locatable(ax[1,0])
+cax3 = divider3.append_axes("right", size="5%", pad=0.05)
+cbar3 = fig.colorbar(im3, cax=cax3)
+cbar3.set_label('Speckle Contrast K [a.u.]')
+
+im4 = ax[1,1].imshow(contrast_array4, cmap = "jet")
+ax[1,1].set_title(f'(e) Speckle Contrast of Laser Speckle for 150 ml/hr', fontsize = 8)
+divider4 = make_axes_locatable(ax[1,1])
+cax4 = divider4.append_axes("right", size="5%", pad=0.05)
+cbar4 = fig.colorbar(im4, cax=cax4)
+cbar4.set_label('Speckle Contrast K [a.u.]')
+
+im5 = ax[1,2].imshow(contrast_array5, cmap = "jet")
+ax[1,2].set_title(f'(f) Speckle Contrast of Laser Speckle for 200 ml/hr', fontsize = 8)
+divider5 = make_axes_locatable(ax[1,2])
+cax5 = divider5.append_axes("right", size="5%", pad=0.05)
+cbar5 = fig.colorbar(im5, cax=cax5)
+cbar5.set_label('Speckle Contrast K [a.u.]')
+
+# Adjust layout
+plt.tight_layout()
+
+# Save the plot
+plt.savefig('images/LSCIReal.png')
+plt.close(fig)
+
+```
+::: {#fig-test-data}
+![](./images/LSCIReal.png)
+
+The real-world results for LSCI on a 150 ml/hr fluid.
+:::
 
 ## Additional Capabilities
 
-The system was successful in taking time lapse images over an extended period of time and could be used for a broad range of biological imaging applications. The time lapse of the Tobacco Hornworm growth resulted in 45 images over the span of 9 days, with 5 hours between each image. An example of one week’s worth of growth is shown in Fig. 5.11a, and an image of the full box on the first and last day is shown in Fig. 5.11b. 
-While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. 5.12a and 5.12b. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al [Branning].
+The system was successful in taking time lapse images over an extended period of time and could be used for a broad range of biological imaging applications. The time lapse of the Tobacco Hornworm growth resulted in 45 images over the span of 9 days, with 5 hours between each image. An example of one week’s worth of growth is shown in Fig. 5.11, and an image of the full box on the first and last day is shown in Fig. 5.12. 
+
+::: {#fig-test-data}
+![](./images/TV%20Remote.png)
+
+A week's worth of growth from one hornworm.
+:::
+
+While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. # and #. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al [Branning].
 
 
