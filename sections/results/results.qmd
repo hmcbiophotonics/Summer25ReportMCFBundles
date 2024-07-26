@@ -179,7 +179,7 @@ bri = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 # Plotting
 plt.figure()
 plt.errorbar(bri, means, yerr=stds, fmt='o', color='blue', linewidth=2, markersize=6, label='Mean')
-plt.title('Exposure Time = 0.01 s')
+plt.title('Exposure Time = 0.1 s')
 plt.suptitle('Pixel Intensity vs. Brightness Level')
 plt.ylim([0, 1100])
 plt.xlabel('Brightness Level [a.u.]')
@@ -193,9 +193,11 @@ plt.savefig('images/brightness2.png')
 plt.close()
 ```
 
-![Fig. 5.2a The pixel intensity versus brightness level for an exposure time of 0.01s](./images/brightness.png)
+::: {#fig-test-data}
+![a. The pixel intensity versus brightness level for an exposure time of 0.01s.](./images/brightness.png)
 
-![Fig. 5.2b The pixel intensity versus brightness level for an exposure time of 0.1.](./images/brightness2.png)
+![b. The pixel intensity versus brightness level for an exposure time of 0.1.](./images/brightness2.png)
+:::
 
 ### Measuring From a Photodiode
 
@@ -292,10 +294,11 @@ plt.close()
 
 ```
 
-![Fig. 5.3a The photodiode pixel intensity versus color code for a brightness level of 1.](./images/photodiodeTuple.png)
+::: {#fig-test-data}
+![a. The photodiode pixel intensity versus color code for a brightness level of 1.](./images/photodiodeTuple.png)
 
-
-![Fig. 5.3b The photodiode pixel intensity versus brightness level for a color code of (0,0,0,255).](./images/photodiodeLevel.png)
+![b. The photodiode pixel intensity versus brightness level for a color code of (0,0,0,255).](./images/photodiodeLevel.png)
+:::
 
 ## Flourescence Imaging  {#fluorescence-imaging}
 
@@ -421,16 +424,23 @@ plt.legend(loc='upper right')
 plt.savefig('images/FITC.png')
 plt.close()
 ```
+::: {#fig-test-data}
+![](./images/FITC.png)
 
-![Fig. 5.5 The pixel intensity versus FITC concentration for varying exposure times.](./images/FITC.png)
+TThe pixel intensity versus FITC concentration for varying exposure times.
+:::
 
-![Fig. 5.6 Fluorescent image of FITC concentrations in a well plate](./images/FITC2.png)
+::: {#fig-test-data}
+![](./images/FITC2.png)
+
+Fluorescent image of FITC concentrations in a well plate.
+:::
 
 ## Laser Speckle Contrast Imaging  {#laser-speckle-contrast-imaging}
 
 ### Simulation
 
-Using the process described in Section 3.3.3, analysis on simulated speckle images and the effect of filtering was run. Fig. 5.7 depicts the simulated results for a filter with cutoff frequency of N/4, where N denotes the size of the speckle image in pixels, while Figures 5.8 and 5.9 show the results for cutoff frequency of N/8 and N/16, respectively. 
+Using the process described in Section 4.3.3, analysis on simulated speckle images and the effect of filtering was run. Fig. 5.7 depicts the simulated results for a filter with cutoff frequency of N/4, where N denotes the size of the speckle image in pixels, while Figures 5.8 and 5.9 show the results for cutoff frequency of N/8 and N/16, respectively.
 
 #### Create a Simulated Speckle Image {.unnumbered}
 
@@ -463,12 +473,12 @@ N = 200  # Size of the speckle pattern
 a = np.random.randn(N, N) + 1j * np.random.randn(N, N)
 ```
 
-#### Create a filter and Apply it to the Speckle Image {.unnumbered}
+#### Create a filter and apply it to the speckle image for cutoff frequency = N/4, then calculate the speckle size {.unnumbered}
 
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from speckleSimulation.py"
-#| 
+#| output: false
 # Compute amplitude, phase and intensity of the original speckle pattern
 amplitude = np.abs(a)
 phase = np.angle(a)
@@ -495,13 +505,6 @@ a_filtered = ift2(A_filtered)
 amplitude_filtered = np.abs(a_filtered)
 phase_filtered = np.angle(a_filtered)
 intensity_filtered = amplitude_filtered **2
-
-```
-
-#### Compute the Autocorrelation and Speckle Size {.unnumbered}
-```{python}
-#| code-fold: true
-#| code-summary: "Show code from speckleSimulation.py"
 
 # Compute autocorrelation of the original and filtered speckle patterns
 autocorrelation_original = ift2(ft2(intensity) * np.conj(ft2(intensity)))
@@ -539,10 +542,6 @@ if indices_filtered.size == 1:
 else:
 	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
 
-# Print the speckle sizes
-print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
-print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
-
 
 # Rayleigh Distribution for the amplitude histograms
 flat = np.abs(amplitude.flatten())
@@ -568,12 +567,6 @@ zoomRegion_fil = (slice(center_fil[0]-zoom, center_fil[0]+zoom), slice(center_fi
 
 autoZoom = autocorrelation_original[zoomRegion]
 autoZoom_fil = autocorrelation_filtered[zoomRegion_fil]
-```
-
-#### Create plots {.unnumbered}
-```{python}
-#| code-fold: true
-#| code-summary: "Show code from speckleSimulation.py"
 
 def add_colorbar(him, ax, cbar_title=""):
     """
@@ -633,13 +626,14 @@ plt.close(fig)
 ::: {#fig-test-data}
 ![](./images/LSCISimulation.png)
 
-The simulated and filtered speckle images.
+The simulated and filtered speckle images for cutoff frequency = N/4.
 :::
 
 #### Cutoff Frequency = N/8
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from speckleSimulation.py"
+#| output: false
 
 # Import the necessary Python packages
 import numpy as np
@@ -728,11 +722,6 @@ if indices_filtered.size == 1:
 else:
 	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
 
-# Print the speckle sizes
-print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
-print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
-
-
 # Rayleigh Distribution for the amplitude histograms
 flat = np.abs(amplitude.flatten())
 flat_fil = np.abs(amplitude_filtered.flatten())
@@ -816,12 +805,13 @@ plt.close(fig)
 ::: {#fig-test-data}
 ![](./images/LSCISimulation2.png)
 
-The simulated and filtered speckle images.
+The simulated and filtered speckle images for cutoff frequency = N/8.
 :::
 #### Cutoff Frequency = N/16
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from speckleSimulation.py"
+#| output: false
 
 # Import the necessary Python packages
 import numpy as np
@@ -910,11 +900,6 @@ if indices_filtered.size == 1:
 else:
 	speckle_size_filtered = indices_filtered[-1] - indices_filtered[0]
 
-# Print the speckle sizes
-print(f"Original speckle size (width at half maximum): {speckle_size_original} pixels")
-print(f"Filtered speckle size (width at half maximum): {speckle_size_filtered} pixels")
-
-
 # Rayleigh Distribution for the amplitude histograms
 flat = np.abs(amplitude.flatten())
 flat_fil = np.abs(amplitude_filtered.flatten())
@@ -998,15 +983,15 @@ plt.close(fig)
 ::: {#fig-test-data}
 ![](./images/LSCISimulation3.png)
 
-The simulated and filtered speckle images.
+The simulated and filtered speckle images for cutoff frequency=  N/16.
 :::
 
-As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N/4 results in a filtered speckle size of 2 pixels, N/8 results in a filtered speckle size of 4 pixels, and N/16 results in a filtered speckle size of 8 pixels, as shown in Figures 5.7, 5.8, and 5.9. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter's cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. 5.7 shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N/4, while Fig. 5.9 shows an amplitude peak at 0.1 for a cutoff frequency of N/16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject's roughness or uniformity.
+As the cutoff frequency decreases, the size of the speckle in pixels increases. The original speckle pattern has a speckle size of 1. A cutoff frequency of N/4 results in a filtered speckle size of 2 pixels, N/8 results in a filtered speckle size of 4 pixels, and N/16 results in a filtered speckle size of 8 pixels, as shown in Figures 5.7, 5.8, and 5.9. This implies that the filter size directly affects the resulting speckle size and a more narrow filter will produce a lower resolution image, but may decrease the noise in the speckle pattern. Additionally, as the filter’s cutoff frequency decreases, the amplitude histogram of the filtered patterns intensity decreases. Fig. 5.7 shows a normalized amplitude peak at approximately 1 for a cutoff frequency of N/4, while Fig. 5.9 shows an amplitude peak at 0.1 for a cutoff frequency of N/16. The simulated results also show an increase in autocorrelation with a decrease in cutoff frequency. The change in autocorrelation is indicative of the change in speckle size across the simulations. In real-world applications, an increase in autocorrelation across images may also imply differences in the subject’s roughness or uniformity.
 
 ### Physical Tests
 The LSCI analysis script was run on images with a cream and water mixture running through the tube at flow rates of 0 ml/hr, 50 ml/hr, 100 ml/hr, 150 ml/hr, and 200 ml/hr. The resulting speckle images, LSCI reproductions and LSCI K values are shown in Fig. 5.10 and Table 5.1. While there is a general decreasing trend in the K values as flow rate decreases, there are discrepancies from value to value. 
 
-#### Finding the moving LSCI K value {.unnumbered}
+#### Finding the moving LSCI K value for a 0.001s exposure time{.unnumbered}
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from speckle_an.py"
@@ -1176,13 +1161,14 @@ from tabulate import tabulate
 # Display the csv as a Markdown table
 
 table = pd.read_csv('Data/0.001s/averages.csv')
+display(Markdown("##### Table 5.1: Average K Values for 0.001s Exposure Tim {.unnumbered}"))
 Markdown(tabulate(
   table, 
   headers=["Flowrate [ml/hr]","Exposure Time [s]", "Average K [a.u.]"]
 ))
 
 ```
-#### Finding the LSCI Reproduction of Different Flowrates {.unnumbered}
+#### Finding the LSCI Reproduction of Different Flowrates for a 0.001s exposure time {.unnumbered}
 ```{python}
 #| code-fold: true
 #| code-summary: "Show code from speckle_an.py"
@@ -1235,7 +1221,7 @@ cbar2 = fig.colorbar(im2, cax=cax2)
 cbar2.set_label('Speckle Contrast K [a.u.]')
 
 im3 = ax[1,0].imshow(contrast_array3, cmap = "jet")
-ax[1,0].set_title(f'(c) Speckle Contrast of Laser Speckle for 100 ml/hr', fontsize = 8)
+ax[1,0].set_title(f'(d) Speckle Contrast of Laser Speckle for 100 ml/hr', fontsize = 8)
 divider3 = make_axes_locatable(ax[1,0])
 cax3 = divider3.append_axes("right", size="5%", pad=0.05)
 cbar3 = fig.colorbar(im3, cax=cax3)
@@ -1266,8 +1252,280 @@ plt.close(fig)
 ::: {#fig-test-data}
 ![](./images/LSCIReal.png)
 
-The real-world results for LSCI on a 150 ml/hr fluid.
+The real-world results for LSCI on a 150 ml/hr fluid for an exposure time of 0.001s.
 :::
+
+One potential reason for this discrepancy is in the exposure time used to capture the speckle images. Fig. 5.11 and Table 5.2 show the same calculations run on an exposure time with a lower exposure time of 0.0008s instead of 0.001s. The resulting values and LSCI reproductions are very similar to the previous results, signifying that the error lies somewhere else in the experimental setup or analysis.
+
+
+#### Finding the moving LSCI K value for a 0.0008s exposure time{.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckle_an.py"
+
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import cv2
+from scipy.ndimage import gaussian_filter
+import os
+import pandas as pd
+
+# Load BMP image and convert to grayscale numpy array
+def load_and_normalize_image(image_path):
+    img = Image.open(image_path).convert('L')
+    img_array = np.array(img)
+    # Normalize the image to range [0, 1]
+    img_normalized = img_array / 255.0
+    return img_normalized
+
+# Function for Fourier Transform
+def ft2(im):
+    return np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(im)))
+
+# Function for Inverse Fourier Transform
+def ift2(im):
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.fftshift(im)))
+
+# Calculate speckle contrast
+def calcSpeckleContrast(image_path):
+    x1 = 2150; x2 = 2600
+    y1 = 1200; y2 = 1600  
+
+    image = plt.imread(image_path)
+    intensity = np.asarray(image[y1:y2, x1:x2])
+    photo = gaussian_filter(intensity, 2)
+
+    window = photo[:][:]
+    w_dev = np.std(window)
+    w_meanInt = np.mean(window)
+    w_speckle_contrast = w_dev / w_meanInt 
+    
+    # the selection of SQUARE x SQUARE pixels where speckle will be calculated
+    SQUARE = 7
+    
+    # convert photo into an np array
+    pArr = np.asarray(photo)
+    
+    # the speckle contrast array that will be returned
+    contrast_array = [ [0]*(len(pArr[0])-SQUARE) for i in range((len(pArr))-SQUARE) ]
+    conMin = np.inf;
+    
+    # The Loop Does the Following:
+    # goes through 7x7 selections of the image
+    # computes the speckle contrast for this region
+    # using this comparison, create a new matrix with values whose magnitude
+        # decreases depending on how "blurry" the selection is
+    for r in range(len(pArr) - SQUARE):
+        for c in range(len(pArr[0]) - SQUARE):
+            x1 = r; x2 = r+SQUARE-1
+            y1 = c; y2 = c+SQUARE-1
+            selection = pArr[x1:x2, y1:y2]
+            
+            s_dev = np.std(selection)
+            s_meanInt = np.mean(selection)
+            
+            # to cut out values outside of the speckle caught on camera
+            #if (s_meanInt <= 0.1 and s_dev <= 0.1):
+              # contrast_array[r][c] = np.NaN
+            #else:
+            s_speckle_contrast = s_dev / s_meanInt
+                
+            if s_speckle_contrast < conMin and s_speckle_contrast != 0:
+                conMin = s_speckle_contrast
+                    
+            contrast_array[r][c] = s_speckle_contrast
+    
+    conArr = np.asarray(contrast_array)
+    conArr[conArr == 0] = conMin
+    
+    return (w_speckle_contrast, contrast_array)
+
+def calcSpeckleContrastVal(image_path):
+    x1 = 2150; x2 = 2600
+    y1 = 1200; y2 = 1600  
+
+    image = plt.imread(image_path)
+    intensity = np.asarray(image[y1:y2, x1:x2])
+   
+    stat_x1 = 0; stat_x2 = 50
+    stat_y1 = 0; stat_y2= 50
+
+    mov_x1 = 0; mov_x2 = 50
+    mov_y1 = 200; mov_y2 = 250      
+
+    filtered = gaussian_filter(intensity, 2)
+
+    static_window = np.asarray(filtered[stat_y1:stat_y2,stat_x1:stat_x2])
+    stat_con = np.std(static_window) / np.mean(static_window)
+    moving_window = np.asarray(filtered[mov_y1:mov_y2,mov_x1:mov_x2])
+    move_con = np.std(moving_window) / np.mean(moving_window)
+
+    return (move_con, stat_con)
+
+def process_images(folder_path):
+    results = {}
+
+    # Iterate through the folder and process images
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.bmp'):
+            # Extract flowrate and exposure time from the filename
+            parts = filename.split('_')
+            flowrate = parts[1]  # Assuming flowrate is the first part
+            exposure_time = parts[2]  # Assuming exposure time is the second part
+
+            # Initialize the flowrate in results dictionary if not already
+            if flowrate not in results:
+                results[flowrate] = {}
+
+            # Initialize the exposure time in the flowrate dictionary if not already
+            if exposure_time not in results[flowrate]:
+                results[flowrate][exposure_time] = []
+
+            # Get the LSCI from the image
+            move_con, stat_con = calcSpeckleContrastVal(os.path.join(folder_path, filename))
+            
+            results[flowrate][exposure_time].append(move_con)
+
+    # Calculate the average for each exposure time within each flowrate
+    averages = {}
+    stds = {}
+    for flowrate, exposure_times in results.items():
+        averages[flowrate] = {}
+        for exposure_time, values in exposure_times.items():
+            averages[flowrate][exposure_time] = np.mean(values)
+    
+    # Convert results to DataFrame for saving
+    df = pd.DataFrame.from_dict({(flowrate, exposure_time): avg 
+                                  for flowrate, exposure_times in averages.items() 
+                                  for exposure_time, avg in exposure_times.items()},
+                                 orient='index', columns=['Average Value']).reset_index()
+
+    # Split the MultiIndex into separate columns
+    df[['Flowrate', 'Exposure Time']] = pd.DataFrame(df['index'].tolist(), index=df.index)
+
+    # Drop the original index column
+    df.drop('index', axis=1, inplace=True)
+
+    # Rearrange columns
+    df = df[['Flowrate', 'Exposure Time', 'Average Value']]
+    df.to_csv(folder_path + '/averages.csv', index=False)
+
+
+# RUN CODE
+
+folder_path = 'Data/0.0008s'
+process_images(folder_path)
+
+#| label: tbl-planets
+#| tbl-cap: Average K value for 0.0008s Exposure Time
+
+from IPython.display import Markdown
+from tabulate import tabulate
+
+# Display the csv as a Markdown table
+
+table = pd.read_csv('Data/0.0008s/averages.csv')
+display(Markdown("##### Table 5.2: Average K Values for 0.0008s Exposure Tim {.unnumbered}"))
+
+Markdown(tabulate(
+  table, 
+  headers=["Flowrate [ml/hr]","Exposure Time [s]", "Average K [a.u.]"]
+))
+
+```
+#### Finding the LSCI Reproduction of Different Flowrates for a 0.0008s exposure time {.unnumbered}
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from speckle_an.py"
+#| output: false
+
+image_path1 = 'Data/0.0008s/LSCI_0ml_0.0008_1.bmp'
+image_path2 = 'Data/0.0008s/LSCI_50ml_0.0008_1.bmp'
+image_path3 = 'Data/0.0008s/LSCI_100ml_0.0008_1.bmp'
+image_path4 = 'Data/0.0008s/LSCI_150ml_0.0008_1.bmp'
+image_path5 = 'Data/0.0008s/LSCI_200ml_0.0008_1.bmp'
+
+x1 = 2150; x2 = 2600
+y1 = 1200; y2 = 1600  
+
+
+# Plot the Original Speckle Image
+original = Image.open(image_path4).convert('L')
+og_int = np.asarray(original)
+og_int = og_int[y1:y2, x1:x2]
+
+# Plot the speckle contrast
+
+(cont1, contrast_array1) = calcSpeckleContrast(image_path1)
+(cont2, contrast_array2) = calcSpeckleContrast(image_path2)
+(cont3, contrast_array3) = calcSpeckleContrast(image_path3)
+(cont4, contrast_array4) = calcSpeckleContrast(image_path4)
+(cont5, contrast_array5) = calcSpeckleContrast(image_path5)
+
+fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(12, 4))
+
+im0 = ax[0,0].imshow(og_int, cmap = 'gray', vmin=0, vmax=255)
+ax[0,0].set_title("(a) Intensity of Laser Speckle for 150 ml/hr", fontsize = 8)
+divider0 = make_axes_locatable(ax[0, 0])
+cax0 = divider0.append_axes("right", size="5%", pad=0.05)
+cbar0 = fig.colorbar(im0, cax=cax0)
+cbar0.set_label('Intensity [a.u.]')
+
+im1 = ax[0,1].imshow(contrast_array1, cmap = "jet")
+ax[0,1].set_title(f'(b) Speckle Contrast of Laser Speckle for 0 ml/hr', fontsize = 8)
+divider1 = make_axes_locatable(ax[0, 1])
+cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+cbar1 = fig.colorbar(im1, cax=cax1)
+cbar1.set_label('Speckle Contrast K [a.u.]')
+
+im2 = ax[0,2].imshow(contrast_array2, cmap = "jet")
+ax[0,2].set_title(f'(c) Speckle Contrast of Laser Speckle for 50 ml/hr', fontsize = 8)
+divider2 = make_axes_locatable(ax[0, 2])
+cax2 = divider2.append_axes("right", size="5%", pad=0.05)
+cbar2 = fig.colorbar(im2, cax=cax2)
+cbar2.set_label('Speckle Contrast K [a.u.]')
+
+im3 = ax[1,0].imshow(contrast_array3, cmap = "jet")
+ax[1,0].set_title(f'(d) Speckle Contrast of Laser Speckle for 100 ml/hr', fontsize = 8)
+divider3 = make_axes_locatable(ax[1,0])
+cax3 = divider3.append_axes("right", size="5%", pad=0.05)
+cbar3 = fig.colorbar(im3, cax=cax3)
+cbar3.set_label('Speckle Contrast K [a.u.]')
+
+im4 = ax[1,1].imshow(contrast_array4, cmap = "jet")
+ax[1,1].set_title(f'(e) Speckle Contrast of Laser Speckle for 150 ml/hr', fontsize = 8)
+divider4 = make_axes_locatable(ax[1,1])
+cax4 = divider4.append_axes("right", size="5%", pad=0.05)
+cbar4 = fig.colorbar(im4, cax=cax4)
+cbar4.set_label('Speckle Contrast K [a.u.]')
+
+im5 = ax[1,2].imshow(contrast_array5, cmap = "jet")
+ax[1,2].set_title(f'(f) Speckle Contrast of Laser Speckle for 200 ml/hr', fontsize = 8)
+divider5 = make_axes_locatable(ax[1,2])
+cax5 = divider5.append_axes("right", size="5%", pad=0.05)
+cbar5 = fig.colorbar(im5, cax=cax5)
+cbar5.set_label('Speckle Contrast K [a.u.]')
+
+# Adjust layout
+plt.tight_layout()
+
+# Save the plot
+plt.savefig('images/LSCIReal2.png')
+plt.close(fig)
+
+```
+::: {#fig-test-data}
+![](./images/LSCIReal2.png)
+
+The real-world results for LSCI on a 150 ml/hr fluid for a 0.0008s exposure time.
+:::
+
+
+Another source of error might be the camera used to take the speckle images. The Arducam IMX519 camera is able to take high quality images with regular lighting conditions, but it is possible that it does not have the resolution and sensitivity needed for LSCI. A possible replacement for the Arducam camera is a [Raspberry Pi High Quality (HQ) camera](https://www.raspberrypi.com/products/raspberry-pi-high-quality-camera/) which could be implemented with the same code as the Arducam camera. This has the potential to reach more conclusive results. Alternatively, an Industrial camera designed for taking speckle images may prove more effective, but not as cost effective as a Raspberry Pi camera. 
+
+Lastly, better filtering or image processing may assist in more accurate LSCI computation. The python scripts used in this project implemented the scipy Python library’s gaussian filter to produce a filtered speckle image before calculating the LSCI. Gaussian filters are a widely used filter in image processing for smoothing and noise reduction. It uses a gaussian kernel to perform a weighted average of the neighboring pixels around a central pixel, where the standard deviation of the gaussian kernel signifies the level of smoothing. Altering the gaussian fit or using a spatial filter as discussed in Brier et. al’s paper @matthias2013laser may prove more effective for future LSCI applications in the OpenIVIS system.
 
 ## Additional Capabilities
 
@@ -1279,6 +1537,108 @@ The system was successful in taking time lapse images over an extended period of
 A week's worth of growth from one hornworm.
 :::
 
-While the OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period, the anthocyanin response was not able to be determined. The response imaged on the 1st and 3rd days of the trial are shown in Fig. # and #. The anthocyanin response is very similar between the two images, and discernible changes are not able to be visualized. It is possible that the type of lettuce being imaged does not have a strong enough concentration of anthocyanin to properly fluoresce, resulting in similar results. Additionally, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al @lee2024detection.
+The OpenIVIS system was able to take images of lettuce leaf decomposition over a three day period. The response imaged on the 1st day is shown in Fig. 12a and the 3rd day in Fig. 12b. The 3rd day shows a significantly NDIA response when compared to the first day, indicating a change in fluorescence output from the lettuce leaf. While the difference in response was imaged, due to limited documentation on how to conduct this experiment, the experimental process and calculations used may be incorrect. An accurate depiction of this trial is shown in the system’s previous publication by Branning et. al @lee2024detection.
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show code from anthComp.py"
+#| output: false
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import cv2
+import pandas as pd
+
+def plot_log_ratio_heatmap(log_ratio, save_path):
+    """ 
+    Function to plot and save the color map of the Anthocyanin response.
+
+    Arguments:
+        log_ratio: A numpy array of the Anthocyanin response
+        save_path: A string with the desired file saving path
+    Returns: 
+        N/A
+    """
+    # Plot the log ratio color map
+    plt.figure(figsize=(8, 6))
+    plt.imshow(log_ratio, cmap='cool', interpolation='nearest', vmin = 0, vmax =3)
+    plt.colorbar(label='NDIA')
+    plt.title(' Ratio Heat Map')
+    plt.axis('off')
+    
+    # Save the log ratio color map
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+def load_image(image_path):
+    """ 
+    Function to load an image as a numpy array.
+
+    Arguments:
+        image_path: A string with the file path for an image
+    Returns: 
+        image: The image loaded as grayscale
+    """
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    if image is None:
+        raise Exception(f"Could not load image from {image_path}")
+    return image
+
+def compute_anth(red_excitation, green_excitation):
+    """ 
+    Function to compute the Anthocyanin response.
+
+    Arguments:
+        red_excitation: The loaded image with red excitation light
+        green_excitation: The loaded image with green excitation light
+    Returns: 
+        NDAI: Thenormalized difference Anthocyanin index
+    """
+    # Read the images as 64-bit numpy arrays
+    red = np.float64(red_excitation)
+    green = np.float64(green_excitation)
+
+    np.errstate(divide='ignore', invalid='ignore')                                     # Ignore the zero values in the arrays 
+    red[np.isnan(red)] = 0.0                                                           # Replace Nan's with zeroes 
+    green[np.isnan(green)] = 0.0                                                       # Replace Nan's with zeroes  
+
+    rgadd = np.add(red,green)                                                          # Add the red and green images together 
+    rgsub = np.subtract(red,green)                                                     # Subtract the green channel from the red channel 
+    red[red == 0] = 1e-6                                                               # Replace zeroes with 1e-6 
+    green[green == 0] = 1e-6                                                           # Replace zeroes with 1e-6 
+
+    NDAI = np.log(np.divide(rgadd, rgsub))                                                     # Calculate the NDAI value
+
+    return NDAI
+# Load the red and green images for the 3rd day
+image1_path1 = 'images/day3Red_Red_1.000_0.100_5.000.png'               # Replace if necessary
+image2_path1 = 'images/day3Green_Green_1.000_1.000_5.000.png'         # Replace if necessary
+red_excitation1 = load_image(image1_path1)
+green_excitation1 = load_image(image2_path1)
+
+# Load the red and green images for the 1st day
+image1_path2 = 'images/CloseFilter4_Red_1.000_0.100_5.000.png'     # Replace if necessary
+image2_path2 = 'images/CloseFilter7_Green_1.000_1.000_5.000.png'   # Replace if necessary
+red_excitation2 = cv2.imread(image1_path2)
+green_excitation2 = cv2.imread(image2_path2)
+
+# Compute the NDAI
+day1 = compute_anth(red_excitation2, green_excitation2)
+day3 = compute_anth(red_excitation1, green_excitation1)
 
 
+heatmap_path1 = 'images/log_ratio_Day1.png'
+heatmap_path2 = 'images/log_ratio_Day3.png'
+
+plot_log_ratio_heatmap(day1, save_path=heatmap_path1)
+
+plot_log_ratio_heatmap(day3, save_path=heatmap_path2)
+
+```
+
+::: {#fig-test-data}
+![a. The anthocyanin response for the 1st day.](images/log_ratio_Day1.png)
+
+![b. The anthocyanin response for the 3rd day.](images/log_ratio_Day3.png)
+:::
