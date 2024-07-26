@@ -12,9 +12,3 @@ This research was supported by the Silicon Valley Community Foundation under Gra
 - Jenny Nguyen - HMC Biology Laboratory Manager
 - Xavier Walter - HMC Staff Engineer 
 - Jacob Staimpel - HMC Engineering Instructional Support Coordinator
-
-## Funding Acknowledgement 
-
-A sample acknowledgement of funding by an NSF grant might read something like the following.
-
-> This research was supported by the National Science Foundation under Grant No. [Your Grant Number]. The authors would like to thank [any other contributors, institutions, or facilities] for their support and collaboration. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.”
