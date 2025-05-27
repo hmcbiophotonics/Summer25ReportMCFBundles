@@ -6,9 +6,4 @@ header-includes:
 ---
 
 
-This research was supported by the Silicon Valley Community Foundation under Grant No. 2022-251322. The authors would like to thank the Colorado School of Mines Cash Lab, Harvey Mudd College, Daniel A. Guerra, Jenny Nguyen, Xavier Walter, and Jacob Staimpel for their support and collaboration.
-
-- Daniel A. Guerra - HMC Chemistry Laboratory and Stockroom Manager
-- Jenny Nguyen - HMC Biology Laboratory Manager
-- Xavier Walter - HMC Staff Engineer 
-- Jacob Staimpel - HMC Engineering Instructional Support Coordinator
+This research was supported by ____ under Grant No. ______. The authors would like to thank the ________ for their support and collaboration.

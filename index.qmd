@@ -1,10 +1,11 @@
 ---
-title: "OpenIVIS Summer 2024 Quarto Report"
+title: "MCF Bundles Summer 2025 Quarto Report"
 html:
   number-sections: false
 header-includes:
   - \setcounter{page}{1} 
 ---
+### FROM OPENIVIS TO SHOW HOW TO DO TABLE OF CONTEXT
 # Table of Contents {.unnumbered}
 1. [Index](index.qmd)
 2. [Abstract](/sections/abstract/abstract.qmd)

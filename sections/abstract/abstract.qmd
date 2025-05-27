@@ -5,5 +5,5 @@ header-includes:
   - \setcounter{page}{2}  
 ---
 
-This paper presents the continuation of the design of an open source, inexpensive, and modular In Vivo Imaging System (IVIS) from the Harvey Mudd Biophotonics Lab during the summer of 2024. The authors contributions include the implementation of fluorescence imaging and laser speckle imaging on an improved physical system design. The system was created using widely available materials and tools including acrylic, a laser cutter, a 3D printer, and a Raspberry Pi computer. The experiments done to verify fluorescence imaging resulted in the expected relationship between fluorescence and fluorescent dye concentrations with a set exposure time of 0.1 seconds. The experiments done to implement and verify laser speckle imaging have assisted in the development of its abilities as an IVIS imaging method, but need further work to provide accurate results. The results from the experiments demonstrate the improved capabilities of the new IVIS system and pathways for future developments.
+This paper presents...
 

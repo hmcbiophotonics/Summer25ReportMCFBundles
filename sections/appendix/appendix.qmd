@@ -4,7 +4,7 @@ output-file: index
 header-includes:
   - \setcounter{page}{8}  
 ---
-
+### BELOW IS FROM OPENIVIS, KEPT TO SHOW HOW TO ADD A LINK TO GITHUB AND A .XLSX FILE
 ## Bill of Materials
 Access the bill of materials through the [Github Repo](https://github.com/hmcbiophotonics/openIVIS/blob/main/Summer%202024/Bill%20of%20Materials.xlsx) or in the table below.
 ```{python}

@@ -1,15 +1,15 @@
 project:
   type: book
 book:
-  title: "OpenIVIS Summer 2024 Report"
+  title: MCF Bundles Summer 2025 Report"
   author:
     - name: Hailey Knolton
       email: hknolton@g.hmc.edu
-    - name: Ruby Peterman
-      email: rpeterman@g.hmc.edu
+    - name: ...
+      email: ...
 
 
-  date: 2024-07-11
+  date: 2025-050-27
   chapters:
     - index.qmd
     - sections/abstract/abstract.qmd
