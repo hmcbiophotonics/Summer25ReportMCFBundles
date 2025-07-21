@@ -4,12 +4,12 @@ book:
   title: MCF Bundles Summer 2025 Report"
   author:
     - name: Hailey Knolton
-      email: hknolton@g.hmc.edu
-    - name: ...
-      email: ...
+      email: hknolton@.hmc.edu
+    - name: Broderick Bownds
+      email: brbownds@hmc.edu
 
 
-  date: 2025-050-27
+  date: 2025-05-27
   chapters:
     - index.qmd
     - sections/abstract/abstract.qmd
