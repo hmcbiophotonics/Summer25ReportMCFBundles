@@ -1,5 +1,5 @@
 ---
-title: "MCF Bundles Summer 2025 Quarto Report"
+title: "Wavefront Shaping Through Flexible Multicore Fibers Bundles: Summer 2025 Quarto Report"
 html:
   number-sections: false
 header-includes:
@@ -10,7 +10,7 @@ header-includes:
 1. [Index](index.qmd)
 2. [Abstract](/sections/abstract/abstract.qmd)
 3. [Introduction](/sections//introduction/introduction.qmd)  
-&nbsp;&nbsp;&nbsp;&nbsp; 3.1 [Multicore Fibers and Motivation](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)     
+&nbsp;&nbsp;&nbsp;&nbsp; 3.1 [Multicore Fibers and Phase Distortions](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)     
 &nbsp;&nbsp;&nbsp;&nbsp; 3.2 [Off-Axis Holography for Phase Measurement](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)      
 &nbsp;&nbsp;&nbsp;&nbsp; 3.3 [High-Quality Interference](/sections//introduction/introduction.qmd#laser-speckle-contrast-imaging)         
 4. [Methods](/sections//methods/methods.qmd)    

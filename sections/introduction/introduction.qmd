@@ -4,21 +4,67 @@ output-file: index
 header-includes:
   - \setcounter{page}{3}  
 ---
-### BELOW IS FROM OPENIVIS, KEPT TO SHOW HOW TO ADD FIGURES, SOURCES, AND EQUATIONS
-## In Vivo Imaging Systems {#in-vivo-imaging-systems}
-\indent In Vivo Imaging Systems (IVIS) are optical imaging devices used in scientific research to create 2D and 3D representations of biological organisms and processes non-invasively. These systems use advanced imaging techniques, such as bioluminescence and fluorescence imaging, to visualize and track various biological activities within an organism over time. This approach to optical imaging can assist in drug development, understanding disease behaviors, or other biological processes in their natural context @refaat2022in. Most IVIS Imaging methods implement optics in order to extract information about a subject based on the optical properties of the subject and the technique being applied. Many commercial IVIS systems can provide additional capabilities such as X-Ray, temperature control, computed tomography (CT), or accessories @vivo_imaging_system.
+
+\indent Optical imaging of complex biological environments, such as deep-brain tissue or internal organs, requires tools that are not only high-resolution but also flexible and minimally invasive. A major challenge in these environments is that biological tissue scatters light, preventing the light from maintaining focus as it penetrates deeper @yanglab2017. The deeper the light travels, the more it scatters, as illustrated in Figure 1. Conventional lenses (Fig. 2A) can be used to focus light non-invasively, but struggle to maintain focus beyond several hundred microns in dense tissue @brakePhD.
+
+![Fig. 3.1 a) Focusing through free space. b) Focusing through thin scattering media. c) Focusing through thick scattering media.](./images/scatter.png)
+
+\indent To overcome this limitation, traditional endoscopic systems often rely on surgically implanting gradient refractive index (GRIN) lenses (Fig. 2B), which use compact cylindrical designs to focus light deeper into tissue @brakePhD. While effective, GRIN lenses are bulky and rigid, limit their maneuverability and reach within the tissue.
+
+![Fig. 3.2 a) Conventional lens. b) GRIN lens. c) MCF and SLM setup](./images/grinLens.png)
+
+\index Multicore fibers (MCFs) offer a more flexible and compact alternative. By transmitting coherent light through multiple small cores packed into a single fiber, MCFs can reach deeper into the scattering tissue with less invasiveness. Their smaller diameters and flexibility allow them to navigate through scattering tissue more easily than GRIN lenses. 
+
+\index Despite these advantages, MCFs introduce its own challenges. As the fiber bends and flexes, each core experiences different mechanical strains, causing variations in optical path length and distorting the phase of the transmitted light. This concept will be explored in more depth in the next section. To address these distortions, this paper examines how off-axis holography, combined with a spatial light modulator (SLM), can be used to measure and correct phase errors introduced by bending a MCF (Fig. 2C).  This approach enables the recovery of clean, focus wavefronts at the fiber output, supporting high-resolution, minimally invasive imaging in complex biological environments.
+
+## Multicore Fibers and Phase Distortion {#multicore-fibers-and-phase-distortion}
+\indent Multicore fibers (MCFs) are optical fibers that contain multiple independent cores embedded within a single cladding, enabling simultaneous transmission of coherent light through each core. A cross-section of a multicore fiber is shown in Figure 3. This architecture supports high-resolution, lensless imaging by allowing spatial light control across many discrete optical paths in a compact, flexible form. Unlike traditional single-core fibers or rigid endoscopic optics, MCFs are especially advantageous for navigating tight or complex environments, such as deep brain tissue or internal organs, where precision and flexibility are critical.
 
 
-![Fig. 3.1 Jablonski Diagram of Fluorescence](./images/jablonski_diagram.png)
+![Fig. 3.3 Cross-section of a MCF](./images/crossSection.png)
+
+\indent However, the same flexibility that makes MCFs useful also introduces complications. When an MCF bends, each core experiences a slightly different mechanical strain, resulting in variations in optical path lengths across the fiber @brakePhD. These variations lead to inter-core phase shifts, which distort the wavefront of the transmitted light and degrade coherence at the output. As a result, even though the light reaches the end of the fiber, it arrives in a scrambled phase profile. This makes the light unsuitable for applications requiring precise wavefront control, such as holographic imaging or targeted neural stimulation. Understanding and correcting these phase distortions is essential for unlocking the full potential of MCFs in biomedical imaging.
+
+## Off-Axis Holography for Phase Measurement {#off-axis-holography-for-phase-measurement}
+
+\indent Off-axis digital holography is a powerful technique for measuring and reconstructing the phase of a light field, particularly in systems where direct phase measurement is not feasible. This method works by interfering a sample beam with a tilted reference beam on a camera sensor, creating an interference pattern that encodes spatial phase information (Fig. 4A) @hartleyMCF. In this setup, the reference beam is intentionally tilted relative to the sample beam, allowing their interference to produce a spatial fringe pattern when recorded on a camera.
+
+![Fig. 3.4 a) Simple off-axis holography setup. b) Interference pattern in the Fourier domain.](./images/simpleOffAxis.png)
+
+ \indent These fringe patterns encode both amplitude and phase differences between the beams. To extract this phase information, a Fourier transform is applied to the captured hologram, translating the data into the frequency domain (Fig. 4B). In this domain, the +1 diffraction order, or the off-axis component, contains the desired phase information. The tilt of the reference beam is critical because it spatially separates the interference terms in the Fourier domain, allowing phase information to be isolated and extracted. The specific steps of phase extraction, from the Fourier transform to the reconstruction of a phase map, are discussed in detail in Section #. In the context of MCF systems, by systematically bending the fiber and analyzing the phase maps change, researchers can characterize the distortions caused by bending. These reconstructions serve as a foundation for correcting phase distortions using spatial light modulators (SLMs) or other adaptive optics tools. In this way, off-axis holography plays a foundational role in enabling wavefront shaping through flexible multicore fiber bundles.
+
+### Fourier Transform and Phase Reconstruction
+
+\indent Once an interference pattern is captured using off-axis holography, the next critical step is to extract the phase information encoded in the fringe pattern. This is done by applying a Fourier transform, which shifts the spatial intensity data recorded by the camera into the frequency domain. The intensity equation (Eq. 1) of the resulting interference includes terms for the intensity of both the reference and sample beams, as well as cross-terms that carry the phase information. Among these, the term of interest is the cross term and its complex conjugate, as they encode the phase difference between the same and reference beams.
 
 \begin{align}
-K = \frac{\sigma }{<I>} \quad \text{(Eq.1)}
+I = \left| \hat{E}_S + \hat{E}_R \right|^2 
+= \left| \hat{E}_S \right|^2 + \left| \hat{E}_R \right|^2 
++ \hat{E}_R \hat{E}_S^* + \hat{E}_S \hat{E}_R^* \quad \text{(Eq.~1)}
 \end{align}
 
+\indent When a 2D Fourier Transform is applied to the recorded hologram, the result is a frequency-domain representation that separates these components spatially. Specifically, the +1 and −1 diffraction orders appear as off-axis components, corresponding to the complex cross-terms. The zero-order (DC) term remains centered and contains only the unmodulated intensity information. These features are illustrated in Figure 4B. To reconstruct the phase, the off-axis component is isolated and shifted to the center of the Fourier domain. An Inverse Fast Fourier Transform (IFFT) is then applied, reconstructing the complex optical field of the sample. The phase is extracted by computing the argument (angle) of this complex field, yielding a two-dimensional phase map of the light that passed through the multicore fiber. Figure 5 demonstrates this process, from raw interference to final phase reconstruction.
 
+![Fig. 3.5  Example of the Fourier transform process. a) Interference pattern. b) Fourier domain of the pattern. c) Off-axis component. d) Isolated off-axis component. e) Off-axis component shifted to the center. f) Reconstructed phase.](./images/example.png)
+
+\indent This reconstructed phase map reveals how the wavefront was distorted by bending or other perturbations in the fiber. It provides a foundation for adaptive wavefront correction, where spatial light modulators (SLMs) are used to pre-compensate for the phase distortions. In this way, this process enables precise refocusing of light at the output of a flexible, bent multicore fiber.
+
+### Expected Phase Pattern from a Bent Multicore Fiber
+
+\indent When the sample beam in an off-axis holography setup passes through a multicore fiber, researchers can recover the phase distortions introduced by fiber bending. The reconstructed phase of a bent MCF typically exhibits a striped pattern corresponding to a linear phase ramp, as shown in Fig. 5C. This pattern arises because bending causes each core in the MCF to stretch or compress by slightly different amounts, depending on its position relative to the bend For example, an L-bend, where one end of the MCF rotates side to side, produces a consistent gradient in optical path lengths across the fiber width. This results in a gradual phase change from one side to the other. 
+
+![Fig. 3.6  a) Unwrapped phase pattern. b) Unwrapped phase plot. c) Wrapped phase pattern. d) Unwrapped phase plot.](./images/ramp.png)
+
+\indent If phase could increase continuously without limit, the result would resemble the smooth ramp shown in Figure 5A, and the corresponding linear plot in Figure 5B. However, in optics, phase is a period quantity typically wrapped between 0 and 2 radians. Once the unwrapped phase reaches 2, it resets to 0. This wrapping causes the observed striped pattern in Figure 5C, which corresponds to the wrapped phase plot in Figure 5D. These patterns are a direct consequence of fiber geometry and are critical for identifying the type and severity of distortion.
+
+## High-Quality Interference {#high-quality-interference}
+
+\indent To produce interference between the sample and reference beams in off-axis holography, the beams must be coherent with each other. Coherence describes the correlation between two beams of light over space and time @pedrotti2017. Beams with random phase relationships are considered incoherent, while beams with a stable phase relationship are coherent @pedrotti2017. The coherence length of a light source refers to the distance over which the phase relationship of coherent beams remains stable @pedrotti2017. For interference to occur, the path length difference between the sample and reference beams must be less than the coherence length of the laser.
+\indent In addition to coherence, the polarization alignment of the beams determines the strength of the interference. Polarization describes the direction in which the electric field of light oscillates, such as vertical or horizontal, or at any angle in between @pedrotti2017. Beams with orthogonal polarizations, such as one vertical and one horizontal, do not interfere, while beams with matching polarizations produce the strongest interference patterns.
+\indent The quality of the interference can be observed by measuring the fringe contrast, or visibility V. Fringe contrast is given by:
 \begin{align}
-F_{fft}(f) &= \text{FFT}\{I(x,y)\} \quad \text{(Eq.2)} \\
-F_{cc}(f) &= F_{fft}(f) \times F_{fft}^{*}(f) \quad \text{(Eq.3)} \\
-F_{A}(t) &= \text{IFFT}\{F_{cc}(f)\} \quad \text{(Eq.4)}
+|V| = \frac{I_{\text{max}} - I_{\text{min}}}{I_{\text{max}} + I_{\text{min}}} \quad \text{(Eq.~2)}
 \end{align}
+where Imax and Imin are the maximum and minimum intensities of one cycle of fringes, respectively @pedrotti2017. The value of V ranges from 0 to 1 (Fig. 6), with 0 indicating no visible fringes and 1 representing perfectly clear fringes @buscher2025. A low fringe contrast corresponds to conditions where the beams are incoherent or have mismatched polarization, and the beams produce weak interference. In contrast, a high fringe contrast implies high coherence, matched polarization, and strong interference. In off-axis holography, fringe contrast carries information about the amplitude of the object wave, while the fringe spacing and position encode the phase of the object wave @pedrotti2017.
 
+![Fig. 3.7 Fringe contrast range.](./images/fringe.png)
