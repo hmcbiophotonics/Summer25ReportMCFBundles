@@ -1,80 +1,41 @@
 ---
 title: Results
-output: index
-jupyter: python3
+output-file: index
 header-includes:
   - \setcounter{page}{5}  
-html:
-    code-fold: true
 ---
 
-### FROM OPENIVIS REPORT, LEFT TO SHOW HOW TO DO CODE BLOCKS AND SHOW RESULTS
-#### Read and Plot Exposure Values {.unnumbered}
-```{python}
-#| code-fold: true
-#| code-summary: "Show code from exposure_analysis.py"
+## System Optimization {#system-optimization}
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
+\indent The original off-axis holography setup (Fig. 7) produced a fringe contrast of V = 0.2, as shown in Figure 10. To investigate whether optical path length differences were limiting fringe visibility, the arm of the reference beam was extended in increments, and fringe contrast was measured for each configuration. This plot in Figure 11 shows how fringe contrast peaks at a path length of 117 cm, indicating the reference and sample beams were best matched at this length.
 
-data1 = pd.read_excel("Data/exposure/lastExposure1.xlsx", sheet_name="Sheet2")
-data2 = pd.read_excel("Data/exposure/lastExposure2.xlsx", sheet_name="Sheet2")
-data3 = pd.read_excel("Data/exposure/lastExposure3.xlsx", sheet_name="Sheet2")
-data4 = pd.read_excel("Data/exposure/lastExposure4.xlsx", sheet_name="Sheet2")
-data5 = pd.read_excel("Data/exposure/lastExposure5.xlsx", sheet_name="Sheet2")
+![Fig. 5.1 V = 0.2.](./images/OGFringe.png)
 
-# For Exposure Times
-data1_subsets = [data1.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
-data2_subsets = [data2.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
-data3_subsets = [data3.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
-data4_subsets = [data4.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
-data5_subsets = [data5.iloc[i:i+8].values.flatten() for i in range(0, 45, 9)]
+![Fig. 5.2  Fringe contrast vs path length of the reference beam.](./images/pathLength.png)
 
-# Calculate means and std for each subset
-m_data1 = np.array([np.mean(subset) for subset in data1_subsets])
-m_data2 = np.array([np.mean(subset) for subset in data2_subsets])
-m_data3 = np.array([np.mean(subset) for subset in data3_subsets])
-m_data4 = np.array([np.mean(subset) for subset in data4_subsets])
-m_data5 = np.array([np.mean(subset) for subset in data5_subsets])
+\indent To assess polarization alignment, a rotating polarizer was placed in front of each beam independently. As the polarizer rotated, images were captured, and the average intensity was calculated for each angle. Figure 12 displays the results. The intensity peaks for the two beams at angles 90o apart, confirming that the beams had orthogonal polarization directions. This mismatch likely contributed to weak interference.
 
-s_data1 = np.array([np.std(subset) for subset in data1_subsets])
-s_data2 = np.array([np.std(subset) for subset in data2_subsets])
-s_data3 = np.array([np.std(subset) for subset in data3_subsets])
-s_data4 = np.array([np.std(subset) for subset in data4_subsets])
-s_data5 = np.array([np.std(subset) for subset in data5_subsets])
-# 
-# Combine means and std of each numbered data
-means = np.mean([m_data1, m_data2, m_data3, m_data4, m_data5], axis=0)
+![Fig. 5.3 Average intensity vs rotation angle of a polarizer.](./images/OGPolar.png)
 
-stds = np.std([s_data1, s_data2, s_data3, s_data4, s_data5], axis=0)
+\indent To improve the fringe contrast and strengthen the interference between the beams, the coherence and polarization alignment of the system was modified. The initial laser, a compact laser module with a USB connector, had a coherence length of approximately 1mm, which required the optical path lengths of the two beams to be matched within that distance. To allow for greater flexibility in path length matching, the laser was replaced with a Helium-Neon (HeNe) laser with a coherence length of 30cm.
+\indent In addition to improving coherence, a polarizing beam splitter (PBS) and a half-wave plate (HWP) were added to the setup to better align the beams’ polarizations. The PBS split the beam into two beams with orthogonal polarizations, and the HWP was used to rotate the polarization of the reference beam to match the polarization of the sample beam. After these changes, the system achieved a higher fringe contrast of V = 0.32 (Fig. 13). While still low, this increase in fringe contrast suggests improved coherence and polarization matching.
 
-exp = [0.001, 0.005, 0.01, 0.05, 0.1]
+![Fig. 5.4 V = 0.32.](./images/NewFringe.png)
 
-plt.figure()
-plt.errorbar(exp, means, yerr=stds, fmt='o', color='red', linewidth=2, markersize=6, label='Mean')
-plt.title('Brightness Level = 0.7')
-plt.suptitle('Pixel Intensity vs. Exposure Time')
-plt.ylim([0, 1100])
-plt.xlabel('Exposure Time [s]')
-plt.ylabel('Pixel Intensity [a.u.]')
-# Polynomial Fit
-coeffs = np.polyfit(exp, means, 4)
-y_fit = np.polyval(coeffs, exp)
-plt.plot(exp, y_fit, 'r', linewidth=2)
+\indent The polarization test was then  repeated to see if the polarization directions matched. Figure 14 shows the resulting plot of this experiment. The intensity of both beams now peak at the same rotation angles. This confirms that the polarizations were successfully aligned. Because the coherence length increased so substantially, repeating the path length optimization experiment was no longer necessary.
 
-plt.savefig('images/exposure.png')
-plt.close()
-```
-::: {#fig-test-data}
-![](./images/exposure.png)
+![Fig. 5.5 Average intensity vs rotation angle for the second setup.](./images/NewPolar.png)
 
-The pixel intensity versus exposure time.
-:::
+\indent Some limitations, such as alignment errors, intensity mismatches, and subjective selection of fringe regions during contrast calculations, may have prevented the contrast from reaching higher values. These limitations are discussed further in Section #.
 
-::: {#fig-test-data}
-![a. The photodiode pixel intensity versus color code for a brightness level of 1.](./images/photodiodeTuple.png)
+## Bend Experiment {#bend-experiment}
 
-![b. The photodiode pixel intensity versus brightness level for a color code of (0,0,0,255).](./images/photodiodeLevel.png)
-:::
+\indent Figure 15A shows the raw intensity pattern captured by the camera using Ben Hartley’s setup. This image represents the interference between the output of a bent multicore fiber and a reference beam. Within the interference pattern, fringes are visible in the individual cores of the fiber (Fig. 15B). The presence of these fringes confirms that the sample and reference beams are coherent and have aligned polarizations (Section #).
+\indent A Fourier transform of the interference pattern is shown in Figure 15C. The off-axis components in the Fourier domain contain the unknown phase information of the MCF. One of these components is isolated with a circular mask (Fig. 15D), and then shifted to the center of the Fourier domain (Fig, 15E) to remove linear phase ramps introduced by the off-axis geometry. Taking the inverse Fourier transform of this shifted component produces the reconstructed phase of the bent MCF, as shown in Figure 15F.
+
+![Fig. 5.6 a) Intensity of the interference pattern. b) Fringes are visible in the individual cores of the fiber. c) Interference pattern in the Fourier domain. d) Off-axis component isolated. e) Off-axis component shifted to the center. e) Reconstructed phase from the IFFT is noisy.](./images/MCFfft.png)
+
+\indent A reference image, obtained by reconstructing the phase of a straight MCF, is subtracted from the reconstructed phase to remove all phase contributions unrelated to bending, as described in Section #. This reference is shown in Figure 16A. The result is shown in Figure 16B, where a striped pattern emerges. This matches the expected behavior described in Section #, where bending the fiber in an L-bend geometry causes a linear phase ramp across the fiber.
+\indent To further study the bending effect, the proximal end of the fiber was rotated in 10o increments to increase the bend angle. The resulting reconstructed phases are shown in Figure 16. When the MCF is straight, the phase is relatively uniform because all cores are in sync (Fig 16A). As the bend angle increases, the phase ramp becomes steeper. This causes the phase to wrap more frequently, resulting in striped patterns with narrower stripes (Fig 16B-D). These results confirm the predicted relationship between fiber bending and the induced phase gradient.
+
+![Fig. 5.7  a) Phase of a straight MCF. b) Phase with a 10o bend. c) Phase with a 20o bend. d) Phase with a 30o bend.](./images/MCFbend.png)

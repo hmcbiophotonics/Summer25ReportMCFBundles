@@ -5,17 +5,17 @@ html:
 header-includes:
   - \setcounter{page}{1} 
 ---
-### FROM OPENIVIS TO SHOW HOW TO DO TABLE OF CONTEXT
+
 # Table of Contents {.unnumbered}
 1. [Index](index.qmd)
 2. [Abstract](/sections/abstract/abstract.qmd)
 3. [Introduction](/sections//introduction/introduction.qmd)  
-&nbsp;&nbsp;&nbsp;&nbsp; 3.1 [Multicore Fibers and Phase Distortions](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)     
-&nbsp;&nbsp;&nbsp;&nbsp; 3.2 [Off-Axis Holography for Phase Measurement](/sections//introduction/introduction.qmd#in-vivo-imaging-systems)      
-&nbsp;&nbsp;&nbsp;&nbsp; 3.3 [High-Quality Interference](/sections//introduction/introduction.qmd#laser-speckle-contrast-imaging)         
+&nbsp;&nbsp;&nbsp;&nbsp; 3.1 [Multicore Fibers and Phase Distortions](/sections//introduction/introduction.qmd#multicore-fibers-and-phase-distortion)     
+&nbsp;&nbsp;&nbsp;&nbsp; 3.2 [Off-Axis Holography for Phase Measurement](/sections//introduction/introduction.qmd#off-axis-holography-for-phase-measurement)      
+&nbsp;&nbsp;&nbsp;&nbsp; 3.3 [High-Quality Interference](/sections//introduction/introduction.qmd#high-quality-interference)         
 4. [Methods](/sections//methods/methods.qmd)    
-&nbsp;&nbsp;&nbsp;&nbsp; 4.1 [Initial Setup and Improvements](/sections/methods/methods.qmd#physical-construction)    
-&nbsp;&nbsp;&nbsp;&nbsp; 4.2 [Ben Hartley's MCF Setup](/sections/methods/methods.qmd#electrical-components-and-software)        
+&nbsp;&nbsp;&nbsp;&nbsp; 4.1 [Initial Setup and Improvements](/sections/methods/methods.qmd#initial-setup-and-improvements)    
+&nbsp;&nbsp;&nbsp;&nbsp; 4.2 [Ben Hartley's MCF Setup](/sections/methods/methods.qmd#ben-hartleys-mcf-setup)        
 5. [Results](/sections/results/results.qmd)    
 &nbsp;&nbsp;&nbsp;&nbsp; 5.1 [System Optimization](/sections/results/results.qmd#system-verification-and-setup)    
 &nbsp;&nbsp;&nbsp;&nbsp; 5.2 [Bending Experiment](/sections/results/results.qmd#flourescence-imaging)         
