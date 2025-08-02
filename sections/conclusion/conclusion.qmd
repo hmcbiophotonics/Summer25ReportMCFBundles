@@ -5,8 +5,20 @@ header-includes:
   - \setcounter{page}{6}  
 ---
 
-# Conclusion  {#conclusion}
-The conclusion summaries the main results of your paper.
-It generally mirrors the abstract, but in slightly more detail.
+\indent Off-axis holography was successfully used to extract phase maps from bent multicore fibers. Initial improvements in fringe contrast were achieved in a preliminary setup by increasing the coherence length and aligning polarization using a Helium-Neon laser, polarizing beam splitter, and half-wave plate. These modifications increased the fringe contrast from 0.2 to 0.32, demonstrating the importance of coherence and polarization for high-quality interference. Using Ben Hartley’s MCF setup, interference patterns were captured and processed to reconstruct the phase of bent fibers. After subtracting a reference phase, the results showed a linear phase ramp that increased with bend angle. These results were consistent with what was expected of the reconstructed phase of a bent MCF.
 
-It is also common for the conclusion to include a discussion of the data, limitations of the work, and directions for future work.
+\indent Several limitations affected the quality of the phase reconstruction. Core length variations across the MCF introduced magnification differences that contributed to noise in the final reconstruction. Misalignment in the optical setup may have reduced interference quality and phase accuracy. Power imbalances between the sample and reference beams likely lowered the achievable fringe contrast, while imperfect isolation and shifting of the off-axis component in the Fourier domain may have introduced residual phase ramps. These factors constrained the clarity of the reconstructed phase maps and may have obscured finer phase details.
+
+\indent Another limitation was the consistently low fringe contrast. This affected the strength of the interference and the reliability of the phase reconstruction. Calculating the fringe contrast itself came with separate challenges. The interference patterns used to compute fringe contrast were not uniformly illuminated, which made some fringes more visible than others. In addition, the MATLAB code ([Section 8.2](/sections/appendix/appendix.qmd#python-and-matlab-code)) used to compute the contrast required the user to manually select a cycle of fringes, introducing potential inconsistencies across measurements.
+
+\indent More complex bend geometries, such as U-shaped bends, may also introduce different phase distortion patterns compared to simpler L-shaped bends. These variations in geometry can affect how the optical path lengths of the cores change across the fiber, resulting in non-linear or asymmetric phase gradients. An example of a more complicated reconstructed phase from a U-bend, where the movable platform moved closer to and farther from the distal end of the MCF, is shown in Figure 6.1. Additional analysis would be needed to characterize how these different bending geometries influence the reconstructed phase.
+
+![Fig. 6.1 Reconstructed phase from U-bend geometry.](./images/UBend.png)
+
+\indent Even complex phase distortions introduced by fiber bending can theoretically be corrected using a spatial light modulator (SLM). An SLM enables the programming of a known phase pattern onto a beam. [Section 8.3](/sections/appendix/appendix.qmd#camera-and-slm) includes the manual for the Meadowlark SLM used for this project. The next step in this project is to use the reconstructed phase patterns, regardless of complexity, to apply a compensating phase through the SLM. If the inverse of the reconstructed phase is encoded on the SLM and projected through the fiber, it should cancel out the bending-induced distortions and refocus the beam at the output, as shown in Figure 6.2 @brakePhD.
+
+![Fig. 6.2 a) Without phase correction, the light fails to focus at the output. b) With phase correction, the light focuses at the output.](./images/SLMDifference.png)
+
+\indent Ben Hartley’s proposed setup for correcting for phase distortions is shown in Figure 6.3 @hartleyMCF. A coherent source, such as the HeNe laser, is reflected off the SLM and directly through the MCF. Simultaneously, a low-coherent source, such as a superluminescent diode (SLD), is used as the reference beam and is launched into the fiber. Because of its short coherence length, the SLD reflects from the distal end of the fiber, creating the sample beam. The interference between the sample and reference beams at the camera allows for phase reconstruction, which can then be fed back into the SLM in real time for continuous correction.
+
+![Fig. 5.3 Ben Hartley’s proposed phase correction setup.](./images/SLMSetup.png)

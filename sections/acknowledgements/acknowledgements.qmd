@@ -6,4 +6,5 @@ header-includes:
 ---
 
 
-This research was supported by the U.S. National Science Foundation under Grant No. 2302023. The authors would like to thank ________ for their support and collaboration.
+This research was supported by the U.S. National Science Foundation under Grant No. 2302023. The authors would like to thank Professor Joshua Brake, Ben Hartley, and Harvey Mudd College for their support and collaboration.
+

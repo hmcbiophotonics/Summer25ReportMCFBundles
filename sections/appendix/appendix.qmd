@@ -4,27 +4,184 @@ output-file: index
 header-includes:
   - \setcounter{page}{8}  
 ---
-### BELOW IS FROM OPENIVIS, KEPT TO SHOW HOW TO ADD A LINK TO GITHUB AND A .XLSX FILE
-## Bill of Materials
-Access the bill of materials through the [Github Repo](https://github.com/hmcbiophotonics/openIVIS/blob/main/Summer%202024/Bill%20of%20Materials.xlsx) or in the table below.
+
+## Off-Axis Holography Simulations {#simulations}
+Access the colab simulation script through the [Google Drive](https://drive.google.com/drive/u/0/folders/19UOTeoF1nK9KP1pScuKj6m1_m4dYD4K9) or in the code blocks below.
+
+
 ```{python}
-#| echo: false
-import pandas as pd
+#| code-fold: true
+#| code-summary: "Show code for Imports"
 
-# Local path to the Excel file
-file_path = "Bill of Materials.xlsx"
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+import scipy.ndimage
+from scipy.ndimage import gaussian_filter
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib import cm
+from numpy import pi
+from scipy.ndimage import center_of_mass
 
-# Read the Excel file
-df = pd.read_excel(file_path)
 
-# Display the table
-df
+# Function for adding nicely-formatted colorbar
+def add_colorbar(him, ax, cbar_title=""):
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(him, cax=cax)
+    cbar.set_label(cbar_title, rotation=270, labelpad=15)
 ```
-## Python Packages
-The full list of Python packages needed is available below.
 
-## Python Code
-The python files can be accessed via the project's [GitHub Repo](https://github.com/hmcbiophotonics/openIVIS/tree/main/Summer%202024/raspberryPiFiles)
+``` {python}
+#| code-fold: true
+#| code-summary: "Show code for off-axis holography with a delta wavefront sample"
+
+# Grid size
+N = 500
+x = np.linspace(-N, N, N)  # in microns or any unit
+y = x
+X, Y = np.meshgrid(x, y)
+Z = 0  # flat 2D plane
+
+# Radial distance from the center (point source)
+R = np.sqrt(X**2 + Y**2 + Z**2)
+R[R == 0] = 1e-6  # avoid division by zero at center
+
+# Wavelength and wave number (in nm and rad/nm)
+lambda_nm = 633
+k_nm = 2 * np.pi / lambda_nm  # wave number
+
+# Complex spherical wave field (delta source at center)
+Es = 1/R*np.exp(1j * k_nm * R)
+
+dx_nm = 100  # physical pixel size
+x_nm = np.linspace(-N//2, N//2 - 1, N) * dx_nm
+y_nm = x_nm
+X, Y = np.meshgrid(x_nm, y_nm)
+z=0
+lambda_nm = 633
+lambda_m = lambda_nm * 1e-9
+
+k_inv_nm = 2*np.pi/lambda_nm
+
+theta_deg = 30
+theta = np.pi/180*theta_deg
+
+phi_deg = 30
+phi = np.pi/180*phi_deg
+
+k_x_inv_nm = k_inv_nm*np.sin(theta)*np.cos(phi)
+k_y_inv_nm = k_inv_nm*np.sin(theta)*np.sin(phi)
+k_z_inv_nm = k_inv_nm*np.cos(theta)
+
+E_ref_mag = np.ones((N,N))
+E_ref_phase_rad = k_x_inv_nm*X + k_y_inv_nm*Y + k_z_inv_nm*z
+
+Er = E_ref_mag*np.exp(1j * E_ref_phase_rad)
+
+
+I = np.abs(Er+Es)**2
+
+nb = 5;  # if nb = 1 =, no zero padding / nb > 1, add zeros in the Fourier tranform, see the help of fft2
+Fh = np.fft.fftshift(np.fft.fft2(I,s=[N*nb,N*nb]))
+
+
+## Create the vector of the spatial frequencies
+dx_nm = 100  # e.g., pixel size is 10 nm
+L = N * dx_nm  # total physical length in nm
+
+# Define correct frequency vectors (in 1/nm)
+fx = np.fft.fftshift(np.fft.fftfreq(N*nb, d=dx_nm))  # cycles per nm
+fy = fx
+Sx, Sy = np.meshgrid(fx, fy)
+
+
+## Now we want to do a filtering of the spatial frequencies to keep only the -1 order
+# Center frequency location (in 1/nm)
+fx_center = k_x_inv_nm / (2 * np.pi)
+fy_center = k_y_inv_nm / (2 * np.pi)
+
+# Radius of the circular mask in 1/nm (try 1.5× the frequency spacing to start)
+radius = fx_center/4
+
+# Circular mask around (-fx_center, -fy_center)
+Mask1 = ((Sx + fx_center)**2 + (Sy + fy_center)**2) < radius**2
+
+## We get the field in the Fourier plane after filtering
+Fh2 = Fh*Mask1
+
+cy, cx = center_of_mass(np.abs(Fh2))
+
+# Shift to center
+shift_y = Fh.shape[0]//2 - int(cy)
+shift_x = Fh.shape[1]//2 - int(cx)
+Fh3 = np.roll(Fh2, shift=(shift_y, shift_x), axis=(0,1))
+
+
+
+## Get the field after the second length
+tempIFT1 = np.fft.ifft2(np.fft.ifftshift(Fh2))
+finalField1 = tempIFT1[0:N,0:N]
+
+Es_tilt = Es * np.exp(-1j * E_ref_phase_rad)
+phase_diff1 = np.angle(Es_tilt) - np.angle(finalField1)
+
+tempIFT2 = np.fft.ifft2(np.fft.ifftshift(Fh3))
+finalField2 = tempIFT2[0:N,0:N]
+phase_diff2 = np.angle(Es_tilt) - np.angle(finalField2)
+```
+
+``` {python}
+#| code-fold: true
+#| code-summary: "Show code for plotted results"
+
+fig, ax = plt.subplots(4, 3, figsize=(12, 14))
+
+
+ax[0,0].imshow(np.angle(Es))
+ax[0,0].set_title('Phase of the Sample')
+
+ax[0,1].imshow(np.angle(Er))
+ax[0,1].set_title('Phase of the Reference Signal')
+
+ax[0,2].imshow(I)
+ax[0,2].set_title('Interference Pattern')
+
+ax[1,0].imshow(np.abs(Fh+0.01),extent=[-0.5*N,0.5*N-1,-0.5*N,0.5*N-1],norm=LogNorm())
+ax[1,0].set_title('Intensity in the Fourier Plane')
+
+ax[1,1].imshow(np.abs(Fh2+0.01),extent=[-0.5*N,0.5*N-1,-0.5*N,0.5*N-1],norm=LogNorm())
+ax[1,1].set_title('Intensity of Filtered Signal (-1 Order)')
+
+ax[1,2].imshow(np.abs(Fh3+0.01),extent=[-0.5*N,0.5*N-1,-0.5*N,0.5*N-1], norm=LogNorm())
+ax[1,2].set_title('Intensity of the Filtered Signal Centered')
+
+ax[2,0].imshow(np.angle(Es_tilt));
+ax[2,0].set_title('Original Phase With Tilt')
+
+ax[2,1].imshow(np.angle(finalField1));
+ax[2,1].set_title('Reconstructed Phase Uncentered')
+
+im = ax[2,2].imshow(phase_diff1)
+ax[2,2].set_title('Phase Difference')
+plt.colorbar(im, ax=ax[2,2])
+
+ax[3,0].imshow(np.angle(Es));
+ax[3,0].set_title('Original Phase Without Tilt')
+
+ax[3,1].imshow(np.angle(finalField2));
+ax[3,1].set_title('Reconstructed Phase Centered')
+
+im = ax[3,2].imshow(phase_diff2)
+ax[3,2].set_title('Phase Difference')
+plt.colorbar(im, ax=ax[3,2])
+```
+
+## Python and MATLAB Scripts {#python-and-matlab-scripts}
+The python and MATLAB files can be accessed via the project's [Google Drive](https://drive.google.com/drive/u/0/folders/10S1xLh61XNX6dzel1CA6wFQbFGP1tzNo)
 
 ## CAD Files
-The CAD files can be accessed via the project's [GitHub Repo](https://github.com/hmcbiophotonics/openIVIS/tree/main/Summer%202024/Physical%20Components)
+The Meadowlark optics SLM manual and aditional information can be accessed via the project's [Google Drive](https://drive.google.com/drive/u/0/folders/1KSpUFZnkbSWYm1V9S05anVIwsoHlxC3m)
+
+The pco.panda camera and aditional information can be accessed via the project's [Google Drive](https://drive.google.com/drive/u/0/folders/1ILDmt6R8Ru6QOSBShQARN3Rk35gMLL0D)
+
